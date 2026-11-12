@@ -12,6 +12,9 @@
 declare module "node:test" {
   export function describe(name: string, fn: () => void): void;
   export function it(name: string, fn: () => void | Promise<void>): void;
+  export namespace it {
+    export function skip(name: string, fn?: () => void | Promise<void>): void;
+  }
 }
 
 declare module "node:zlib" {
@@ -24,7 +27,11 @@ declare module "node:zlib" {
 
 declare module "node:fs" {
   export function readFileSync(path: string): Uint8Array;
+  export function readFileSync(path: string, encoding: string): string;
+  export function existsSync(path: string): boolean;
 }
+
+declare const __dirname: string;
 
 declare module "node:path" {
   export function join(...parts: string[]): string;

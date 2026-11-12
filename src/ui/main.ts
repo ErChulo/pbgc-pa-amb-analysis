@@ -344,11 +344,13 @@ import {
   parseCsv,
   parseJsonImport,
   rowsToCasePackage,
+  salaryFormConflict,
   unknownColumns,
 } from "./import";
 import type { ImportedRow, ImportReport } from "./import";
 import { parseXlsx } from "./xlsxReader";
 import type { XlsxParseResult } from "./xlsxReader";
+import { renderInputGuide } from "./inputGuide";
 
 /** Shared row → package → state step for CSV, JSON rows, and XLSX.
 // DOPT is required (no date is guessed); the case number comes from
@@ -370,6 +372,15 @@ function importMappedRows(
     sheetNames?: readonly string[];
   },
 ): { state: UiState; report: ImportReport | null; error: string | null } {
+  // Conflict rule (Stage 2 §3.7): a file mixing salary_YYYY and
+  // S001–S050 columns is refused whole — never silently pick one
+  // salary form. This is the shared file-level entry, so the check
+  // here covers CSV, JSON rows, and XLSX (single- and multi-sheet)
+  // alike; the parse sites below check again before mapping.
+  const conflict = salaryFormConflict(headers);
+  if (conflict !== null) {
+    return { state, report: null, error: `Import refused: ${conflict}` };
+  }
   const dopt = mapped.map((r) => r.dopt).find((d) => d !== null) ?? null;
   if (dopt === null) {
     return {
@@ -445,6 +456,10 @@ export function importFileBytes(
         error: `XLSX import refused: ${fileName} has no sheet named "${sheetName}". Sheets in the file: ${parsed.sheets.map((s) => s.name).join(", ")}.`,
       };
     }
+    const sheetConflict = salaryFormConflict(sheet.headers);
+    if (sheetConflict !== null) {
+      return { state, report: null, error: `Import refused: ${sheetConflict}` };
+    }
     const mapped = sheet.rows.map(mapImportedRow);
     return importMappedRows(state, fileName, mapped, sheet.headers, sheet.rows.length, parsed.fileHashSha256, actor, occurredAt, {
       warnings: [...parsed.warnings, ...sheet.warnings],
@@ -482,6 +497,10 @@ export function importFileText(
     }
     if (lower.endsWith(".csv")) {
       const { headers, rows, warnings } = parseCsv(text);
+      const csvConflict = salaryFormConflict(headers);
+      if (csvConflict !== null) {
+        return { state, report: null, error: `Import refused: ${csvConflict}` };
+      }
       const mapped = rows.map(mapImportedRow);
       return importMappedRows(state, fileName, mapped, headers, rows.length, "not-computed", actor, occurredAt, { warnings });
     }
@@ -511,6 +530,10 @@ export function importFileText(
           },
           error: null,
         };
+      }
+      const jsonConflict = salaryFormConflict(parsed.headers);
+      if (jsonConflict !== null) {
+        return { state, report: null, error: `Import refused: ${jsonConflict}` };
       }
       const mapped = parsed.rows.map(mapImportedRow);
       return importMappedRows(state, fileName, mapped, parsed.headers, parsed.rows.length, "not-computed", actor, occurredAt);
@@ -717,6 +740,10 @@ export function demoValidationParticipant(pkg: CasePackage, key: string): Valida
   const lastSalary = knownSalaries[knownSalaries.length - 1];
   const formulaCheck: Record<string, number> = { "SYN-001": 150000, "SYN-003": 150000, "SYN-V-01": 84950 };
   const checkValue = formulaCheck[key] ?? null;
+  // ANNACT comes from the package's CompensationHistory, same source
+  // as rowsToValidationParticipants in import.ts; the demo package
+  // states no flag, so it defaults to "A" as before.
+  const annact = ch.annualizedFlagSource.value ?? "A";
   return {
     participantKey: key, bcvRecId: p.bcvRecId.value, caseNumber: DEMO_CASE_NUMBER,
     idType: "1", ssn: null, firstName: p.firstName.value, lastName: p.lastName.value,
@@ -737,7 +764,8 @@ export function demoValidationParticipant(pkg: CasePackage, key: string): Valida
     pia: null, integrationMethod: "none", firstYear: ch.firstYear.value,
     lastYear: ch.lastYear.value,
     salaryByYear: ch.salaryByYear.map((s) => ({ year: s.salaryYear, amount: s.amount?.amountMinor ?? null })),
-    annact: "A", annualizationBasisNoted: true,
+    annact,
+    annualizationBasisNoted: annact !== "B",
     averagingPeriodYears: knownSalaries.map((s) => s.salaryYear),
     formCode: dote === null ? null : "NSF", formCodeNsf: "NSF", formCodeNmf: "NMF",
     formCodeQpsa: null, formCodeArd: null, spcVal: "0", spcNsf: "0", spcArd: "0",
@@ -996,6 +1024,10 @@ export function casePackageValidationParticipants(pkg: CasePackage): ValidationP
     const lastSalary = knownSalaries[knownSalaries.length - 1];
     const nrd = dob === null ? null : `${Number(dob.slice(0, 4)) + 65}${dob.slice(4)}`;
     const recordedMinor = obs?.paAmb.value?.amountMinor ?? null;
+    // ANNACT comes from the package's CompensationHistory, same source
+    // as rowsToValidationParticipants in import.ts; a package with no
+    // flag defaults to "A" as before.
+    const annact = ch?.annualizedFlagSource.value ?? "A";
     return {
       participantKey: key,
       bcvRecId: p.bcvRecId.value,
@@ -1059,8 +1091,8 @@ export function casePackageValidationParticipants(pkg: CasePackage): ValidationP
       firstYear: ch?.firstYear.value ?? null,
       lastYear: ch?.lastYear.value ?? null,
       salaryByYear: (ch?.salaryByYear ?? []).map((s) => ({ year: s.salaryYear, amount: s.amount?.amountMinor ?? null })),
-      annact: "A",
-      annualizationBasisNoted: true,
+      annact,
+      annualizationBasisNoted: annact !== "B",
       averagingPeriodYears: knownSalaries.map((s) => s.salaryYear),
       formCode: dote === null ? null : "NSF",
       formCodeNsf: "NSF",
@@ -1884,6 +1916,14 @@ function elementById(root: HTMLElement, id: string): HTMLElement | null {
 
 /** Render the shell from state: nav locks, panels, status, invariants, charts, reports. */
 export function renderApp(root: HTMLElement, state: UiState): void {
+  // Pre-upload input-shape guide (inputGuide.ts, rendered from the
+  // importer's own column list): visible on the Import step before
+  // the file picker. Filled on every render, so it is present
+  // whenever the app renders.
+  const inputGuide = elementById(root, "input-guide");
+  if (inputGuide !== null) {
+    inputGuide.innerHTML = renderInputGuide();
+  }
   const themeButton = elementById(root, "theme-toggle");
   if (themeButton !== null) {
     themeButton.textContent = themeToggleLabel(state.theme);

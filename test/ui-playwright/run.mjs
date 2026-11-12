@@ -1,6 +1,6 @@
 // Stage 6 — Playwright suite runner (Worker E).
 //
-// Runs the four UI suites in order and prints a pass/fail summary.
+// Runs the UI suites in order and prints a pass/fail summary.
 // Usage: node test/ui-playwright/run.mjs
 // Playwright is required by absolute path from stage3/live-test/ (see
 // helpers.mjs); it is not a repo-root dependency.
@@ -17,6 +17,8 @@ const SUITES = [
   "defensive-loading.test.mjs",
   "xlsx-import.test.mjs",
   "csv-import.test.mjs",
+  "salary-s050.test.mjs",
+  "input-guide.test.mjs",
 ];
 
 let failures = 0;

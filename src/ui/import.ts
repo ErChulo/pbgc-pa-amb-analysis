@@ -34,6 +34,15 @@
  * case tolerance (tolerances stay case-set by the actuary); validation
  * runs on it, calculation needs provisions first.
  *
+ * Salary form (Stage 2 §3.7): a file carries either `salary_YYYY`
+ * columns or the BCV form `S001`–`S050` with `FRSTYEAR`, `LASTYEAR`,
+ * `ANNACT`, `SALARYDESC` — never both (a file mixing the two forms is
+ * refused, never silently resolved to one form). S001 is the most
+ * recent year: year of S00n = LASTYEAR − (n − 1). LASTYEAR is required
+ * when any S-year is present; a row with S-values but no LASTYEAR is
+ * quarantined, never year-guessed. FRSTYEAR missing does not block
+ * mapping — rule S-10 already flags it in validation.
+ *
  * Synthetic data only in tests. No live case data.
  */
 
@@ -192,10 +201,30 @@ export const IMPORT_KNOWN_COLUMNS: ReadonlySet<string> = new Set([
   "vs",
   "es",
   "paAmbMinor",
+  "FRSTYEAR",
+  "LASTYEAR",
+  "ANNACT",
+  "SALARYDESC",
   "dopt",
 ]);
 
 const SALARY_COLUMN_RE = /^salary_(\d{4})$/;
+/** BCV salary columns S001–S050 (Stage 2 §3.7). n = 1..50; S001 is the
+ *  most recent year, year of S00n = LASTYEAR − (n − 1). */
+const S_SALARY_COLUMN_RE = /^S(00[1-9]|0[1-4][0-9]|050)$/;
+
+/** Conflict rule (Stage 2 §3.7): a file carrying both salary forms
+ *  must be refused, never silently resolved to one form. Returns the
+ *  plain-language refusal reason, or null when the headers use at
+ *  most one salary form. The check is file-level (headers), not
+ *  per-row: one mixed file is refused whole. */
+export const SALARY_FORM_CONFLICT_MESSAGE =
+  "The file mixes salary_YYYY columns and S001–S050 columns. Use one salary form, not both.";
+export function salaryFormConflict(headers: readonly string[]): string | null {
+  const hasSalaryYyyy = headers.some((h) => SALARY_COLUMN_RE.test(h));
+  const hasSColumns = headers.some((h) => S_SALARY_COLUMN_RE.test(h));
+  return hasSalaryYyyy && hasSColumns ? SALARY_FORM_CONFLICT_MESSAGE : null;
+}
 const DECIMAL_RE = /^-?\d+(\.\d+)?$/;
 const INTEGER_RE = /^-?\d+$/;
 
@@ -213,10 +242,23 @@ export interface ImportedRow {
   vs: string | null;
   es: string | null;
   paAmbMinor: number | null;
-  salaries: Array<{ year: number; minor: number | null }>;
+  salaries: Array<{ year: number; minor: number | null; sourceField: string }>;
+  /** FRSTYEAR / LASTYEAR as read (null when blank or unparseable). */
+  firstYear: number | null;
+  lastYear: number | null;
+  /** ANNACT as read: "A" (Actual), "B" (Annualized), null when blank
+   *  or not A/B. */
+  annact: "A" | "B" | null;
+  /** SALARYDESC as read (salary source), null when blank. */
+  salaryDesc: string | null;
+  /** Plain-language notes about the row that are not bad cells (e.g.
+   *  ANNACT missing while the LASTYEAR salary is present). Surfaced
+   *  in the import report warnings by rowsToCasePackage. */
+  warnings: string[];
   badDates: BadDateInput[];
   badNumbers: BadNumberInput[];
-  /** True when the row cannot become a participant at all (no key). */
+  /** True when the row cannot become a participant at all (no key,
+   *  or S-values with no LASTYEAR to derive their years from). */
   quarantined: boolean;
   quarantineReason: string | null;
 }
@@ -270,25 +312,103 @@ function parseMinorCell(
   return Number(value);
 }
 
+/** Parse an integer year cell (FRSTYEAR / LASTYEAR). Blank is null;
+ *  a non-integer value is a badNumbers entry and null, never guessed. */
+function parseIntegerYearCell(
+  row: Record<string, string>,
+  field: string,
+  badNumbers: BadNumberInput[],
+): number | null {
+  const raw = row[field];
+  if (blank(raw)) return null;
+  const value = (raw as string).trim();
+  if (!INTEGER_RE.test(value)) {
+    badNumbers.push({ field, raw: value, reason: "not an integer year" });
+    return null;
+  }
+  return Number(value);
+}
+
 /** Map one raw CSV/JSON row object into typed values. Never throws for
- *  a bad cell: the cell becomes a badDates/badNumbers entry and null. */
+ *  a bad cell: the cell becomes a badDates/badNumbers entry and null.
+ *  Salary form (Stage 2 §3.7): `salary_YYYY` columns map straight to
+ *  their year; `S001`–`S050` map to year LASTYEAR − (n − 1) and are
+ *  dollars in the file, stored as integer cents (×100 — S001=60000
+ *  becomes 6000000 cents). A blank S-year is missing, never zero.
+ *  A row with S-values but no LASTYEAR cannot be year-mapped and is
+ *  quarantined. */
 export function mapImportedRow(raw: Record<string, string>): ImportedRow {
   const badDates: BadDateInput[] = [];
   const badNumbers: BadNumberInput[] = [];
-  const salaries: Array<{ year: number; minor: number | null }> = [];
+  const warnings: string[] = [];
+  const salaries: Array<{ year: number; minor: number | null; sourceField: string }> = [];
   for (const [header, value] of Object.entries(raw)) {
     const match = SALARY_COLUMN_RE.exec(header);
     if (match === null) continue;
     const year = Number(match[1]);
     if (blank(value)) {
-      salaries.push({ year, minor: null });
+      salaries.push({ year, minor: null, sourceField: header });
       continue;
     }
     const minor = parseMinorCell(raw, header, badNumbers);
-    salaries.push({ year, minor });
+    salaries.push({ year, minor, sourceField: header });
   }
+  const firstYear = parseIntegerYearCell(raw, "FRSTYEAR", badNumbers);
+  const lastYear = parseIntegerYearCell(raw, "LASTYEAR", badNumbers);
+  let annact: "A" | "B" | null = null;
+  const annactRaw = raw["ANNACT"];
+  if (!blank(annactRaw)) {
+    const value = (annactRaw as string).trim().toUpperCase();
+    if (value === "A" || value === "B") {
+      annact = value;
+    } else {
+      warnings.push(`ANNACT "${(annactRaw as string).trim()}" is not A or B — treated as blank.`);
+    }
+  }
+  const salaryDesc = blank(raw["SALARYDESC"]) ? null : (raw["SALARYDESC"] as string).trim();
+  // S001–S050: year of S00n = LASTYEAR − (n − 1). Without LASTYEAR
+  // the years cannot be derived, so S-values quarantine the row.
+  let hasSValue = false;
+  const sSalaries: Array<{ year: number; minor: number | null; sourceField: string }> = [];
+  for (const [header, value] of Object.entries(raw)) {
+    const match = S_SALARY_COLUMN_RE.exec(header);
+    if (match === null) continue;
+    const n = Number(match[1]);
+    if (!blank(value)) hasSValue = true;
+    if (lastYear === null) continue;
+    // S001–S050 are dollars in the file; the canonical layer is
+    // integer cents, so multiply by 100. salary_YYYY values are
+    // already cents and take the other path, untouched.
+    const dollars = parseMinorCell(raw, header, badNumbers);
+    const minor = dollars === null ? null : dollars * 100;
+    sSalaries.push({ year: lastYear - (n - 1), minor, sourceField: header });
+  }
+  salaries.push(...sSalaries);
   salaries.sort((a, b) => a.year - b.year);
+  // ANNACT is conditionally required when the LASTYEAR salary is
+  // present (Stage 2 §3.7). No validation rule covers a missing
+  // ANNACT — rule P-14(d) covers only ANNACT = B with no basis note —
+  // so the missing value is noted here, in the row's import warnings,
+  // and surfaced in the import report by rowsToCasePackage.
+  const effectiveLastYear =
+    lastYear ?? (salaries.length === 0 ? null : (salaries[salaries.length - 1] as { year: number }).year);
+  const lastYearSalary =
+    effectiveLastYear === null
+      ? undefined
+      : salaries.find((s) => s.year === effectiveLastYear);
+  if (annact === null && lastYearSalary !== undefined && lastYearSalary.minor !== null) {
+    warnings.push(
+      "ANNACT missing — the LASTYEAR salary is present, so ANNACT is required (A = Actual, B = Annualized).",
+    );
+  }
   const key = blank(raw["participantKey"]) ? null : (raw["participantKey"] as string).trim();
+  const quarantineReasons: string[] = [];
+  if (key === null) {
+    quarantineReasons.push("Row has no participantKey — it cannot become a participant.");
+  }
+  if (hasSValue && lastYear === null) {
+    quarantineReasons.push("S001–S050 present but LASTYEAR missing — salary years cannot be derived.");
+  }
   return {
     key,
     raw: { ...raw },
@@ -303,10 +423,15 @@ export function mapImportedRow(raw: Record<string, string>): ImportedRow {
     es: parseDecimalCell(raw, "es", badNumbers),
     paAmbMinor: parseMinorCell(raw, "paAmbMinor", badNumbers),
     salaries,
+    firstYear,
+    lastYear,
+    annact,
+    salaryDesc,
+    warnings,
     badDates,
     badNumbers,
-    quarantined: key === null,
-    quarantineReason: key === null ? "Row has no participantKey — it cannot become a participant." : null,
+    quarantined: quarantineReasons.length > 0,
+    quarantineReason: quarantineReasons.length === 0 ? null : quarantineReasons.join(" "),
   };
 }
 
@@ -314,7 +439,12 @@ export function mapImportedRow(raw: Record<string, string>): ImportedRow {
 export function unknownColumns(headers: readonly string[]): string[] {
   const out: string[] = [];
   for (const h of headers) {
-    if (!IMPORT_KNOWN_COLUMNS.has(h) && SALARY_COLUMN_RE.exec(h) === null && !out.includes(h)) {
+    if (
+      !IMPORT_KNOWN_COLUMNS.has(h) &&
+      SALARY_COLUMN_RE.exec(h) === null &&
+      S_SALARY_COLUMN_RE.exec(h) === null &&
+      !out.includes(h)
+    ) {
       out.push(h);
     }
   }
@@ -347,7 +477,10 @@ export function rowsToValidationParticipants(
   const participants: ValidationParticipant[] = [];
   let recId = 0;
   for (const row of rows) {
-    if (row.key === null) continue;
+    // Quarantined rows (no key, or S-values with no LASTYEAR) never
+    // reach validation as a participant — same rule as
+    // rowsToCasePackage below.
+    if (row.quarantined || row.key === null) continue;
     recId += 1;
     const knownSalaries = row.salaries.filter((s) => s.minor !== null);
     const meanAnnualMinor =
@@ -356,6 +489,16 @@ export function rowsToValidationParticipants(
         : Math.round(knownSalaries.reduce((s, x) => s + (x.minor as number), 0) / knownSalaries.length);
     const lastSalary = knownSalaries[knownSalaries.length - 1];
     const nrd = row.nrd ?? nrdOf(row.dob);
+    // FRSTYEAR / LASTYEAR, when the file states them (the S-form),
+    // are the span; otherwise the span is derived from the salary
+    // years, as before.
+    const firstYear =
+      row.firstYear ?? (row.salaries.length === 0 ? null : (row.salaries[0] as { year: number }).year);
+    const lastYear =
+      row.lastYear ??
+      (row.salaries.length === 0
+        ? null
+        : (row.salaries[row.salaries.length - 1] as { year: number }).year);
     participants.push({
       participantKey: row.key,
       bcvRecId: blank(row.raw["bcvRecId"]) ? recId : Number(row.raw["bcvRecId"]),
@@ -416,14 +559,15 @@ export function rowsToValidationParticipants(
           : Math.round((lastSalary.minor as number) / 12),
       pia: null,
       integrationMethod: "none",
-      firstYear: row.salaries.length === 0 ? null : (row.salaries[0] as { year: number }).year,
-      lastYear:
-        row.salaries.length === 0
-          ? null
-          : (row.salaries[row.salaries.length - 1] as { year: number }).year,
+      firstYear,
+      lastYear,
       salaryByYear: row.salaries.map((s) => ({ year: s.year, amount: s.minor })),
-      annact: "A",
-      annualizationBasisNoted: true,
+      // The file's ANNACT, not a hardcoded "A". No column carries a
+      // note of the annualization basis, so ANNACT = B leaves
+      // annualizationBasisNoted false and the existing rule P-14(d)
+      // fires its Warning; A (or blank) needs no basis note.
+      annact: row.annact,
+      annualizationBasisNoted: row.annact !== "B",
       averagingPeriodYears: knownSalaries.map((s) => s.year),
       formCode: row.dote === null ? null : "NSF",
       formCodeNsf: "NSF",
@@ -471,7 +615,7 @@ export function rowsToValidationParticipants(
       badNumbers: row.badNumbers,
       fieldsWithoutProvenance: [],
       supportingEvidenceForScale: true,
-      s001Derivable: true,
+      s001Derivable: lastYear !== null,
       scheduleProvided: true,
       scheduleRowExists: true,
       schedulePaAmb: row.paAmbMinor,
@@ -623,6 +767,7 @@ export function rowsToCasePackage(
     initialSnapshotHash: snapshotHash,
   });
   const quarantinedRows: ImportReport["quarantinedRows"] = [];
+  const rowWarnings: string[] = [];
   const seenKeys = new Set<string>();
   const participants: Participant[] = [];
   const employmentPeriods: EmploymentPeriod[] = [];
@@ -637,6 +782,7 @@ export function rowsToCasePackage(
     rowNumber += 1;
     badDates += row.badDates.length;
     badNumbers += row.badNumbers.length;
+    for (const w of row.warnings) rowWarnings.push(`Row ${rowNumber}: ${w}`);
     sourceRecords.push(
       makeSourceRecord({
         id: `src-${meta.importId}-row-${rowNumber}`,
@@ -746,17 +892,20 @@ export function rowsToCasePackage(
     compensationHistories.push({
       ...importEntity(`ch-${key}`, meta),
       participantKey: key,
-      firstYear: sourced(firstSalary === undefined ? null : firstSalary.year, prov),
-      lastYear: sourced(lastSalary === undefined ? null : lastSalary.year, prov),
-      salaryByYear: row.salaries.map((s, i) => ({
+      // FRSTYEAR / LASTYEAR, when the file states them (the S-form),
+      // are the span; otherwise the span is derived from the salary
+      // years, as before.
+      firstYear: sourced(row.firstYear ?? (firstSalary === undefined ? null : firstSalary.year), prov),
+      lastYear: sourced(row.lastYear ?? (lastSalary === undefined ? null : lastSalary.year), prov),
+      salaryByYear: row.salaries.map((s) => ({
         salaryYear: s.year,
-        sourceField: `salary_${s.year}`,
+        sourceField: s.sourceField,
         amount: moneyOrNull(s.minor),
-        annualized: false,
+        annualized: row.annact === "B",
         provenance: prov,
       })),
-      annualizedFlagSource: sourced(null, prov),
-      salaryDesc: sourced("Imported salary row.", prov),
+      annualizedFlagSource: sourced(row.annact, prov),
+      salaryDesc: sourced(row.salaryDesc ?? "Imported salary row.", prov),
       currentMonthlyComp: sourced<Money | null>(null, prov),
       paAverageComp: sourced<Money | null>(null, prov),
       compensationDefinitionApplied: "Not stated in the imported file.",
@@ -866,7 +1015,7 @@ export function rowsToCasePackage(
       badDates,
       badNumbers,
       snapshotHash,
-      warnings: [...(extra?.warnings ?? [])],
+      warnings: [...(extra?.warnings ?? []), ...rowWarnings],
       sheetName: extra?.sheetName ?? null,
       sheetNames: [...(extra?.sheetNames ?? [])],
     },

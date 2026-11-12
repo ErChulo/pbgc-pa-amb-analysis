@@ -45,6 +45,7 @@ export { rankCounterfactuals } from "../src/reconciliation";
 export { parseXlsx } from "../src/ui/xlsxReader";
 export { buildXlsx } from "../src/ui/exports";
 export { mapImportedRow } from "../src/ui/import";
+export { COLUMN_MEANINGS, inputGuideColumns, renderInputGuide } from "../src/ui/inputGuide";
 
 import { bootApp } from "../src/ui/main";
 

@@ -37,6 +37,7 @@
       <section data-step-panel="import" aria-label="Import">
         <h2>Import</h2>
         <p>Load the case file. Imported values stay as imported; nothing is changed.</p>
+        <div id="input-guide"></div>
         <p>
           <label for="import-file">Case file (CSV, JSON, or XLSX):</label>
           <input id="import-file" type="file" accept=".csv,.json,.xlsx,.xlsm">
@@ -46,7 +47,6 @@
           <select id="import-sheet"></select>
           <button id="import-sheet-confirm" type="button">Import sheet</button>
         </p>
-        <p>CSV columns: participantKey, caseNumber, ssn, firstName, lastName, dob, sex, doh, dote, dop, nrd, retstat, cs, vs, es, paAmbMinor (integer cents), dopt (required), salary_YYYY. Bad dates and numbers are quarantined, never guessed. XLSX reads cached values only. It never runs macros and never reads formulas. A workbook with more than one sheet asks which sheet to import.</p>
         <p>
           <label for="calculation-date">Calculation date (pinned, for reproducible runs):</label>
           <input id="calculation-date" type="date">

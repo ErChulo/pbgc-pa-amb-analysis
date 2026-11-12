@@ -59,7 +59,7 @@ const TOUR_STEPS: ReadonlyArray<{
 /** One short plain-language paragraph per help topic. */
 const CONTEXT_HELP: Readonly<Record<string, string>> = {
   import:
-    "Import loads the case file: the census, the plan documents, and the prior administrator's benefit schedule. The app keeps the imported values as they were. It never changes a source value.",
+    "Import loads the case file: the census, the plan documents, and the prior administrator's benefit schedule. The app keeps the imported values as they were. It never changes a source value. The file-shape guide is on the Import step, above the file picker.",
   validate:
     "Validate checks the data before any calculation runs. It flags bad dates, bad numbers, duplicate records, and missing fields. A blank stays blank. It is never filled with zero.",
   calculate:
