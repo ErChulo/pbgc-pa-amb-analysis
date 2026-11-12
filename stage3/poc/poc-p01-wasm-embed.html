@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-01 WASM embed probe (file://)</title></head>
+<body><h1>P-01: base64-embedded WASM under file://</h1>
+<pre id="log">running…</pre>
+<script>
+"use strict";
+// P-01 probe. Minimal hand-assembled WASM module (41 bytes):
+// (module (func (export "add") (param i32 i32) (result i32) local.get 0 local.get 1 i32.add))
+// Provenance: hand-assembled raw bytes on the build machine (no Rust toolchain
+// was needed for THIS module). The loading path -- base64 -> atob -> Uint8Array
+// -> WebAssembly.instantiate(bytes) -- is what P-01 proves; the bytes'
+// provenance does not change browser behaviour.
+// PASS criterion (Stage 1 §10): add(2,3) === 5, no console error, Edge, file://, no flags.
+var B64 = "AGFzbQEAAAABBwFgAn9/AX8DAgEABwcBA2FkZAAACgkBBwAgACABags=";
+var log = document.getElementById("log");
+function say(s) { log.textContent += "\n" + s; }
+try {
+  var t0 = performance.now();
+  var bin = atob(B64);
+  var bytes = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+  say("wasm bytes: " + bytes.length + ", base64 chars: " + B64.length);
+  WebAssembly.instantiate(bytes, {}).then(function (r) {
+    var t1 = performance.now();
+    var v = r.instance.exports.add(2, 3);
+    say("add(2,3) = " + v + "  (expect 5)");
+    say("instantiate ms: " + (t1 - t0).toFixed(2));
+    say(v === 5 ? "P-01 RESULT: PASS" : "P-01 RESULT: FAIL (wrong value)");
+  }).catch(function (e) { say("instantiate ERROR: " + e); say("P-01 RESULT: FAIL"); });
+} catch (e) { say("ERROR: " + e); say("P-01 RESULT: FAIL"); }
+</script></body></html>

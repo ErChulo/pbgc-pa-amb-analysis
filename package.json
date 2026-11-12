@@ -1,0 +1,18 @@
+{
+  "description": "Deterministic actuarial engine for PA_AMB (prior administrator accrued monthly benefit) analysis — Stage 4 foundation: canonical types, decimal-safe arithmetic, and the immutable case-package model.",
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "typescript": "^5.9.3"
+  },
+  "license": "UNLICENSED",
+  "main": "dist/src/index.js",
+  "name": "pbgc-pa-amb-analysis",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "bundle": "node build/bundle.mjs",
+    "test": "tsc && node --test dist/test/*.test.js"
+  },
+  "types": "dist/src/index.d.ts",
+  "version": "0.1.0"
+}

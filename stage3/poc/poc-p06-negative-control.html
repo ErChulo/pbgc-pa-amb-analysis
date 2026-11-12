@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-06 negative control (file://)</title></head>
+<body><h1>P-06: fetch / ES modules / instantiateStreaming must FAIL under file://</h1>
+<pre id="log">running…</pre>
+<script>
+"use strict";
+// P-06 negative control. Each of these MUST fail with a CORS/MIME error under
+// file:// (W3C WebAssembly Web API §2: instantiateStreaming rejects with
+// TypeError unless the Response is CORS-same-origin, ok, and
+// Content-Type: application/wasm; a file:// page has origin "null" and no
+// HTTP headers at all, so fetch of a local file is itself CORS-blocked).
+// PASS criterion (Stage 1 §10): all three fail with the documented errors.
+// If any SUCCEEDS, the environment is not the restricted one — re-check setup
+// before trusting any other result.
+var log = document.getElementById("log");
+function say(s) { log.textContent += "\n" + s; }
+say("location.origin: " + location.origin + " (expect 'null')");
+fetch("./poc-p06-negative-control.html").then(function () { say("fetch: UNEXPECTED SUCCESS — environment is not restricted"); })
+  .catch(function (e) { say("fetch: failed as expected: " + e.name + ": " + e.message); });
+WebAssembly.instantiateStreaming(fetch("./add.wasm"), {}).then(function () { say("instantiateStreaming: UNEXPECTED SUCCESS"); })
+  .catch(function (e) { say("instantiateStreaming: failed as expected: " + e.name + ": " + e.message); });
+// ES-module import: a module script tag in this file would fail at load time;
+// dynamic import of a relative module is attempted here:
+import("./poc-p06-module.js").then(function () { say("ES module import: UNEXPECTED SUCCESS"); })
+  .catch(function (e) { say("ES module import: failed as expected: " + e.name + ": " + e.message); });
+say("NOTE: the <script type=\"module\"> static-import case is covered by poc-p06-module.js existing as a separate file; its load failure appears in the console.");
+</script><script type="module">
+// Static ES-module import attempt (module scripts are fetched in CORS mode;
+// from origin "null" this must fail). Success or failure is logged to console.
+import { p06 } from "./poc-p06-module.js";
+console.log("ES module static import: UNEXPECTED SUCCESS, p06 =", p06);
+</script>
+</body></html>

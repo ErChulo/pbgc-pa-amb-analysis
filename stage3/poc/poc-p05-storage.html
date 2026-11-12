@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-05 localStorage / IndexedDB probe (file://)</title></head>
+<body><h1>P-05: localStorage / IndexedDB under file://</h1>
+<p>Steps: 1) open this file, 2) note the log, 3) close Edge, reopen, 4) note whether markers survived, 5) rename/move this file, reopen, note again.</p>
+<pre id="log">running…</pre>
+<script>
+"use strict";
+// P-05 probe. Defensive storage wrapper first (DEL delSafeStorage() precedent:
+// try/catch around every storage touch; a SecurityError on an opaque origin
+// must never kill the script; no-persistence fallback).
+// PASS criterion (Stage 1 §10): behaviour documented (per-path vs shared,
+// survives restart or not); any use gated on the result. Browser storage is
+// never the source of truth and never holds PII by default.
+var log = document.getElementById("log");
+function say(s) { log.textContent += "\n" + s; }
+function safeStorage() {
+  try { var t = "__p05_test__"; localStorage.setItem(t, "1"); localStorage.removeItem(t); return localStorage; }
+  catch (e) { say("localStorage unavailable: " + e.name + ": " + e.message); return null; }
+}
+var ls = safeStorage();
+say("localStorage usable: " + !!ls);
+if (ls) {
+  try {
+    var prev = ls.getItem("pa-amb-p05-marker");
+    say("previous localStorage marker: " + (prev === null ? "(none — first run or did not survive)" : prev));
+    ls.setItem("pa-amb-p05-marker", "written " + new Date().toISOString());
+    say("localStorage marker written; read back: " + ls.getItem("pa-amb-p05-marker"));
+  } catch (e) { say("localStorage ERROR: " + e.name + ": " + e.message); }
+}
+try {
+  var req = indexedDB.open("pa-amb-p05", 1);
+  req.onupgradeneeded = function () { req.result.createObjectStore("s"); };
+  req.onsuccess = function () {
+    var db = req.result;
+    var tx = db.transaction("s", "readwrite");
+    tx.objectStore("s").put("written " + new Date().toISOString(), "marker");
+    tx.oncomplete = function () {
+      var tx2 = db.transaction("s", "readonly");
+      var g = tx2.objectStore("s").get("marker");
+      g.onsuccess = function () { say("IndexedDB marker read back: " + g.result); };
+    };
+    say("IndexedDB opened OK");
+  };
+  req.onerror = function () { say("IndexedDB ERROR: " + req.error); };
+} catch (e) { say("IndexedDB ERROR: " + e.name + ": " + e.message); }
+navigator.storage && navigator.storage.estimate && navigator.storage.estimate().then(function (e) {
+  say("storage estimate: quota=" + e.quota + " usage=" + e.usage);
+});
+say("--- manual: reopen after browser restart, then after renaming/moving this file; record survival + whether another local HTML file can see the marker ---");
+say("P-05 OVERALL: NEEDS LIVE file:// BROWSER TEST");
+</script></body></html>

@@ -1,0 +1,78 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>P-10 browser test (live-test only)</title></head>
+<body><h1>P-10 browser test (live-test only)</h1>
+<input type="file" id="file" accept=".csv">
+<pre id="log">waiting for file…</pre>
+<script>
+"use strict";
+// Live-test helper only (not a PoC probe). Replicates poc-p10-100k.js exactly:
+// same constants, same BigInt math, same chunked parse into typed arrays, same
+// stats. Input via file picker. Reports import ms, calc ms, counts, mean/max
+// |delta|, and performance.memory (JS heap) before/after.
+var ALPHA_BPS = 150n, DIVISOR = 10000000n, TOL_ABS_CENTS = 500n;
+var AVG_LO_CENTS = 100000n, AVG_HI_CENTS = 800000n, CHUNK = 10000;
+var log = document.getElementById("log");
+function say(s){ log.textContent += "\n" + s; }
+function memMB(){ return (performance.memory ? (performance.memory.usedJSHeapSize/1048576).toFixed(1) + " MB" : "n/a (performance.memory unavailable)"); }
+document.getElementById("file").addEventListener("change", async function(e){
+  var file = e.target.files[0];
+  if(!file){ say("no file"); return; }
+  say("file: " + file.name + " (" + file.size + " bytes)");
+  say("heap before import: " + memMB());
+  var t0 = performance.now();
+  var text = await file.text();
+  var n = 100000;
+  var serviceMilli = new Int32Array(n);
+  var avgCents = new BigInt64Array(n);
+  var paAmb = new BigInt64Array(n);
+  var pos = 0, row = -1, chunkRows = 0, chunks = 0;
+  while (pos < text.length) {
+    var nl = text.indexOf("\n", pos);
+    var line = nl === -1 ? text.slice(pos) : text.slice(pos, nl);
+    pos = nl === -1 ? text.length : nl + 1;
+    if (!line) continue;
+    if (row === -1) { row = 0; continue; }
+    var f = line.split(",");
+    serviceMilli[row] = parseInt(f[4], 10);
+    avgCents[row] = f[5] === "" ? -1n : BigInt(f[5]);
+    paAmb[row] = BigInt(f[6]);
+    row++;
+    if (++chunkRows >= CHUNK) { chunks++; chunkRows = 0; }
+  }
+  var t1 = performance.now();
+  var importMs = t1 - t0;
+  say("imported rows: " + row + " (expect 100000), chunks: " + (chunks + (chunkRows ? 1 : 0)));
+  say("import ms: " + importMs.toFixed(1));
+  say("heap after import: " + memMB());
+  var tCalc0 = performance.now();
+  var exact = 0, bounded = 0, withinTol = 0, outsideTol = 0;
+  var paInsideBounds = 0, paOutsideBounds = 0;
+  var sumAbsDelta = 0n, maxAbsDelta = 0n;
+  for (var i = 0; i < n; i++) {
+    if (avgCents[i] === -1n) {
+      bounded++;
+      var lo = (ALPHA_BPS * BigInt(serviceMilli[i]) * AVG_LO_CENTS) / DIVISOR;
+      var hi = (ALPHA_BPS * BigInt(serviceMilli[i]) * AVG_HI_CENTS) / DIVISOR;
+      if (paAmb[i] >= lo && paAmb[i] <= hi) paInsideBounds++; else paOutsideBounds++;
+      continue;
+    }
+    exact++;
+    var recon = (ALPHA_BPS * BigInt(serviceMilli[i]) * avgCents[i]) / DIVISOR;
+    var delta = paAmb[i] - recon;
+    var abs = delta < 0n ? -delta : delta;
+    sumAbsDelta += abs;
+    if (abs > maxAbsDelta) maxAbsDelta = abs;
+    if (abs <= TOL_ABS_CENTS) withinTol++; else outsideTol++;
+  }
+  var tCalc1 = performance.now();
+  var calcMs = tCalc1 - tCalc0;
+  say("calc+reconciliation ms: " + calcMs.toFixed(1));
+  say("total (import+calc) ms: " + (importMs + calcMs).toFixed(1));
+  say("exact: " + exact + ", bounds (missing avg): " + bounded);
+  say("within $5 tolerance: " + withinTol + ", outside: " + outsideTol);
+  say("PA inside bounds: " + paInsideBounds + ", outside: " + paOutsideBounds);
+  say("mean |delta|: $" + (Number(sumAbsDelta / BigInt(exact)) / 100).toFixed(2) + ", max |delta|: $" + (Number(maxAbsDelta) / 100).toFixed(2));
+  say("heap after calc: " + memMB());
+  say("P-10 BROWSER RESULT: PASS (completed without freezing)");
+  window.__p10done = true;
+});
+</script></body></html>

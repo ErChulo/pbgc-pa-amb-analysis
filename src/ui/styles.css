@@ -1,0 +1,298 @@
+/* PA_AMB Analysis System — app styles (Stage 6, Worker A).
+ *
+ * Dark theme by default (MASTER_PROMPT §18; Stage 3 P-09 probe tokens).
+ * Light theme via [data-theme="light"] on <html>.
+ *
+ * GAP (flagged, not invented around): PBGC Design System v1.1.0 defines
+ * no dark theme. Dark tokens below are the P-09 probe tokens
+ * (bg #000000, fg #f2f0e9, muted #b8b5ac, accent #7fb3ff,
+ * header #0a1f44). Where the design system defines a token — PBGC blue
+ * #002D72, Helvetica Neue/Arial — the light theme uses it, and the dark
+ * header uses the P-09 dark header #0a1f44. If the design system later
+ * adds a dark theme, replace these tokens with its tokens.
+ *
+ * No external fonts, no CDN, no fetch. Classic single-file app.
+ */
+
+/* ---- Theme tokens ---- */
+:root,
+[data-theme="dark"] {
+  --bg: #000000;
+  --fg: #f2f0e9;
+  --muted: #b8b5ac;
+  --accent: #7fb3ff;
+  --row-alt: #141414;
+  --border: #333333;
+  --header-bg: #0a1f44;
+  --header-fg: #ffffff;
+  --button-bg: #0a1f44;
+  --button-fg: #ffffff;
+  --focus: #7fb3ff;
+  --warn: #ffb86b;
+  --fail: #ff9d9d;
+  --pass: #9ed69e;
+}
+
+[data-theme="light"] {
+  --bg: #ffffff;
+  --fg: #1a1a1a;
+  --muted: #555555;
+  --accent: #002d72;
+  --row-alt: #f2f2f2;
+  --border: #cccccc;
+  --header-bg: #002d72;
+  --header-fg: #ffffff;
+  --button-bg: #002d72;
+  --button-fg: #ffffff;
+  --focus: #002d72;
+  --warn: #8a5a00;
+  --fail: #a00000;
+  --pass: #006400;
+}
+
+/* ---- Base ---- */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  line-height: 1.25;
+  margin: 0 0 8px 0;
+}
+
+h1 { font-size: 20px; }
+h2 { font-size: 16px; }
+h3 { font-size: 14px; }
+
+p { margin: 0 0 8px 0; }
+
+a { color: var(--accent); }
+
+.muted { color: var(--muted); }
+.accent { color: var(--accent); }
+
+/* ---- Header ---- */
+#app-header {
+  background: var(--header-bg);
+  color: var(--header-fg);
+  padding: 10px 16px;
+}
+
+#app-header h1 {
+  margin: 0;
+}
+
+#app-header .subtitle {
+  color: var(--header-fg);
+  opacity: 0.85;
+  margin: 2px 0 0 0;
+}
+
+#app-header .header-actions {
+  margin-top: 8px;
+}
+
+/* ---- Compact navigation ---- */
+#wizard-nav,
+#app-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+}
+
+#wizard-nav button,
+#app-nav button {
+  flex: 0 0 auto;
+}
+
+nav button[aria-current="step"] {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+  font-weight: bold;
+}
+
+/* ---- Buttons ---- */
+button {
+  background: var(--button-bg);
+  color: var(--button-fg);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 6px 12px;
+  font-family: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  filter: brightness(1.15);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.secondary {
+  background: transparent;
+  color: var(--fg);
+}
+
+/* Visible focus for keyboard and screen-reader users. */
+button:focus-visible,
+a:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ---- Layout ---- */
+#pa-amb-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 0 32px 0;
+}
+
+main {
+  padding: 12px 16px;
+}
+
+section {
+  margin-bottom: 16px;
+}
+
+#status-line {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+#help-panel {
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  margin: 12px 16px;
+}
+
+/* ---- Tables ---- */
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 13px;
+}
+
+th, td {
+  border: 1px solid var(--border);
+  padding: 4px 8px;
+  text-align: left;
+  vertical-align: top;
+}
+
+th {
+  background: var(--header-bg);
+  color: var(--header-fg);
+}
+
+tbody tr:nth-child(even) td {
+  background: var(--row-alt);
+}
+
+/* ---- Wizard steps ---- */
+[data-step-panel] {
+  border: 1px solid var(--border);
+  padding: 12px;
+  margin-bottom: 12px;
+}
+
+#advanced-view section {
+  border: 1px solid var(--border);
+  padding: 12px;
+}
+
+/* ---- Invariants, dispositions, charts, reports ---- */
+#invariant-list li {
+  margin-bottom: 4px;
+}
+
+#disposition-summary {
+  font-weight: bold;
+}
+
+#chart-area svg {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin-bottom: 16px;
+}
+
+#report-area {
+  border-top: 1px solid var(--border);
+  padding-top: 12px;
+}
+
+#report-area h1, #report-area h2 {
+  color: var(--fg);
+}
+
+/* ---- Print (reports) ---- */
+@media print {
+  body {
+    background: #ffffff;
+    color: #000000;
+  }
+
+  #app-header,
+  #wizard-nav,
+  #app-nav,
+  #status-line,
+  .header-actions,
+  button {
+    display: none !important;
+  }
+
+  #pa-amb-app {
+    max-width: none;
+  }
+
+  [data-step-panel],
+  #advanced-view section,
+  #help-panel {
+    border: none;
+    padding: 0;
+  }
+
+  section {
+    page-break-inside: avoid;
+  }
+
+  table, th, td {
+    border-color: #666666;
+  }
+
+  th {
+    background: #eeeeee;
+    color: #000000;
+  }
+
+  a {
+    color: #000000;
+    text-decoration: none;
+  }
+}

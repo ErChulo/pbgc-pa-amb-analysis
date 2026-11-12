@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-08 zero-fetch probe (file://)</title></head>
+<body><h1>P-08: single file, 0 fetch</h1>
+<p>This file intentionally contains no external reference of any kind: no http(s) URL, no fetch/XHR, no import, no worker, no font, no image, no stylesheet link. All CSS and JS are inline; all data is generated in-page.</p>
+<pre id="log">ready. Open DevTools &gt; Network, reload, and confirm 0 requests of any kind.</pre>
+<script>
+"use strict";
+// P-08 probe. The local check (poc-p08-check.js) greps every probe HTML file
+// for external-reference patterns; the live check is DevTools Network = 0.
+// PASS criterion (Stage 1 §10): 0 requests of any kind in DevTools.
+document.getElementById("log").textContent = "P-08 local check: see poc-p08-check.js output.\nP-08 live check: DevTools Network must show 0 requests — NEEDS LIVE file:// BROWSER TEST.";
+</script></body></html>

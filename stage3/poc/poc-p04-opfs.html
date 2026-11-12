@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-04 OPFS probe (file://)</title></head>
+<body><h1>P-04: OPFS under file://</h1>
+<p>Steps: 1) open this file, 2) note the log, 3) close Edge, reopen this file, 4) note whether the marker survived, 5) rename/move this file, reopen, note again.</p>
+<pre id="log">running…</pre>
+<script>
+"use strict";
+// P-04 probe. Tests navigator.storage.getDirectory() on the main thread and
+// from a blob-URL worker; writes a marker file, reads it back, and (across
+// browser restarts / file rename, by hand) checks persistence and origin keying.
+// PASS criterion (Stage 1 §10): read/write/read-after-restart all succeed and
+// origin-keying behaviour is documented. OPFS is never the source of truth
+// even if this passes (Stage 1 §4.1/§5.5) — at most a session cache.
+var log = document.getElementById("log");
+function say(s) { log.textContent += "\n" + s; }
+say("isSecureContext: " + window.isSecureContext);
+say("location.origin: " + location.origin);
+say("navigator.storage present: " + !!navigator.storage);
+(async function () {
+  try {
+    var dir = await navigator.storage.getDirectory();
+    say("getDirectory() main thread: OK");
+    var fh = await dir.getFileHandle("pa-amb-p04-marker.txt", { create: true });
+    var w = await fh.createWritable();
+    await w.write("p04-marker written " + new Date().toISOString() + "\n");
+    await w.close();
+    var f = await fh.getFile();
+    say("marker read back: " + (await f.text()).trim());
+    var est = await navigator.storage.estimate();
+    say("storage estimate: quota=" + est.quota + " usage=" + est.usage);
+    say("P-04 main-thread RESULT: PASS (this session)");
+  } catch (e) { say("main-thread ERROR: " + e.name + ": " + e.message); say("P-04 main-thread RESULT: FAIL"); }
+  say("--- restart + rename checks are manual: reopen this file after closing Edge, then after renaming/moving it, and record whether the marker survives ---");
+  say("P-04 OVERALL: NEEDS LIVE file:// BROWSER TEST (restart + rename steps are manual)");
+})();
+</script></body></html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PA_AMB Analysis — Prior Administrator Accrued Monthly Benefit</title>
+<!--STYLES-->
+</head>
+<body>
+<div id="pa-amb-app">
+  <header id="app-header">
+    <h1>PA_AMB Analysis</h1>
+    <p class="subtitle">Prior administrator accrued monthly benefit — case analysis workbench. Offline only. Nothing is uploaded.</p>
+    <div class="header-actions">
+      <button id="theme-toggle" type="button" aria-label="Switch to light theme">Switch to light theme</button>
+      <button id="view-mode-toggle" type="button">Advanced view</button>
+      <button id="tour-button" type="button">Tour</button>
+      <button id="help-button" type="button" aria-expanded="false">Help</button>
+      <button id="demo-button" type="button">Try demo case</button>
+    </div>
+  </header>
+
+  <p id="status-line" role="status">No case loaded.</p>
+
+  <nav id="wizard-nav" aria-label="Workflow steps">
+    <button type="button" data-wizard-step="import">1. Import</button>
+    <button type="button" data-wizard-step="validate">2. Validate</button>
+    <button type="button" data-wizard-step="calculate">3. Calculate</button>
+    <button type="button" data-wizard-step="reconcile">4. Reconcile</button>
+    <button type="button" data-wizard-step="statistics">5. Review statistics</button>
+    <button type="button" data-wizard-step="decide">6. Decide</button>
+    <button type="button" data-wizard-step="export">7. Export</button>
+  </nav>
+
+  <main>
+    <div id="wizard-view">
+      <section data-step-panel="import" aria-label="Import">
+        <h2>Import</h2>
+        <p>Load the case file. Imported values stay as imported; nothing is changed.</p>
+        <p>
+          <label for="import-file">Case file (CSV or JSON):</label>
+          <input id="import-file" type="file" accept=".csv,.json">
+        </p>
+        <p>CSV columns: participantKey, caseNumber, ssn, firstName, lastName, dob, sex, doh, dote, dop, nrd, retstat, cs, vs, es, paAmbMinor (integer cents), dopt (required), salary_YYYY. Bad dates and numbers are quarantined, never guessed. XLSX is not read yet — CSV is the interchange format.</p>
+        <p>
+          <label for="calculation-date">Calculation date (pinned, for reproducible runs):</label>
+          <input id="calculation-date" type="date">
+        </p>
+        <p id="import-status" role="status">No file imported yet.</p>
+        <button type="button" data-help-topic="import">Help: Import</button>
+      </section>
+      <section data-step-panel="validate" aria-label="Validate" hidden>
+        <h2>Validate</h2>
+        <p>66 rules check the data. A blank stays blank; it is never filled with zero.</p>
+        <button id="run-validate" type="button" data-run-step="validate">Run validation</button>
+        <button type="button" data-help-topic="validate">Help: Validate</button>
+      </section>
+      <section data-step-panel="calculate" aria-label="Calculate" hidden>
+        <h2>Calculate</h2>
+        <p>Rebuild each benefit from the plan rules. Every step shows its work.</p>
+        <button id="run-calculate" type="button" data-run-step="calculate">Run calculation</button>
+        <button type="button" data-help-topic="calculate">Help: Calculate</button>
+      </section>
+      <section data-step-panel="reconcile" aria-label="Reconcile" hidden>
+        <h2>Reconcile</h2>
+        <p>Compare the rebuilt benefit with the prior administrator's amount.</p>
+        <button id="run-reconcile" type="button" data-run-step="reconcile">Run reconciliation</button>
+        <button type="button" data-help-topic="reconcile">Help: Reconcile</button>
+      </section>
+      <section data-step-panel="statistics" aria-label="Review statistics" hidden>
+        <h2>Review statistics</h2>
+        <p>Population summary and outlier flags. Statistics suggest; they never decide.</p>
+        <button id="run-statistics" type="button" data-run-step="statistics">Run statistics</button>
+        <button type="button" data-help-topic="statistics">Help: Statistics</button>
+      </section>
+      <section data-step-panel="decide" aria-label="Decide" hidden>
+        <h2>Decide</h2>
+        <p>One disposition per participant. The app recommends. Only a named human approves.</p>
+        <button id="run-decide" type="button" data-run-step="decide">Recommend all dispositions</button>
+        <button type="button" data-help-topic="decide">Help: Decide</button>
+      </section>
+      <section data-step-panel="export" aria-label="Export" hidden>
+        <h2>Export</h2>
+        <p>Save the report and the case package. Nothing is uploaded.</p>
+        <div>
+          <button id="run-publish" type="button" data-run-step="export">Publish contribution</button>
+          <button id="export-audit-log" type="button">Audit log (JSON)</button>
+          <button id="export-reconciliation-csv" type="button">Reconciliation (CSV)</button>
+          <button id="export-reconciliation-xlsx" type="button">Reconciliation (XLSX)</button>
+          <button id="export-contribution" type="button">Contribution package (JSON)</button>
+        </div>
+        <button type="button" data-help-topic="export">Help: Export</button>
+      </section>
+    </div>
+
+    <div id="advanced-view" hidden>
+      <h2>Advanced view</h2>
+      <p>All steps open on the same case state. A step still shows its lock reason when its input is missing.</p>
+    </div>
+
+    <section aria-label="Dispositions">
+      <h2>Dispositions</h2>
+      <p id="disposition-summary">No dispositions yet.</p>
+    </section>
+
+    <section aria-label="Invariants">
+      <h2>Invariants</h2>
+      <ul id="invariant-list"></ul>
+    </section>
+
+    <section aria-label="Charts">
+      <h2>Charts</h2>
+      <div id="chart-area"><p>No charts yet — run Calculate and Reconcile first.</p></div>
+    </section>
+
+    <section aria-label="Report">
+      <h2>Report</h2>
+      <div id="report-area"><p>No report yet — run Validate, Calculate, Reconcile, and Review statistics first.</p></div>
+    </section>
+  </main>
+
+  <div id="help-panel" hidden></div>
+</div>
+<script>
+<!--BUNDLE-->
+</script>
+</body>
+</html>

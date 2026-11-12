@@ -1,0 +1,5 @@
+node_modules
+dist
+
+# Playwright live-test browser profiles (regenerated per run)
+stage3/live-test/profile-*/

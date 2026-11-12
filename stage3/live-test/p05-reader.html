@@ -1,0 +1,28 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>P-05 reader (live-test only)</title></head>
+<body><pre id="log">running…</pre><script>
+"use strict";
+// Live-test helper only (not a PoC probe). Reads the P-05 localStorage and
+// IndexedDB markers WITHOUT writing them, so it can test whether they survived
+// a browser restart or a file move, and whether another local HTML file can
+// see them (shared origin vs per-path keying under file://).
+var log = document.getElementById("log");
+function say(s){ log.textContent += "\n" + s; }
+say("location.origin: " + location.origin);
+try {
+  var v = localStorage.getItem("pa-amb-p05-marker");
+  say("localStorage marker: " + (v === null ? "(none)" : v));
+} catch(e){ say("localStorage ERROR: " + e.name + ": " + e.message); }
+try {
+  var req = indexedDB.open("pa-amb-p05", 1);
+  req.onupgradeneeded = function(){ say("IndexedDB: onupgradeneeded fired (DB did not exist at version 1)"); };
+  req.onsuccess = function(){
+    var db = req.result;
+    if (!db.objectStoreNames.contains("s")) { say("IndexedDB: no object store 's'"); say("READER DONE"); return; }
+    var tx = db.transaction("s", "readonly");
+    var g = tx.objectStore("s").get("marker");
+    g.onsuccess = function(){ say("IndexedDB marker: " + (g.result === undefined ? "(none)" : g.result)); say("READER DONE"); };
+    g.onerror = function(){ say("IndexedDB get ERROR: " + g.error); say("READER DONE"); };
+  };
+  req.onerror = function(){ say("IndexedDB open ERROR: " + req.error); say("READER DONE"); };
+} catch(e){ say("IndexedDB ERROR: " + e.name + ": " + e.message); say("READER DONE"); }
+</script></body></html>

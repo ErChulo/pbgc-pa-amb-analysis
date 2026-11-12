@@ -1,0 +1,26 @@
+<!DOCTYPE html><html><head><meta charset="utf-8"><title>OPFS reader (live-test only)</title></head>
+<body><pre id="log">running…</pre><script>
+"use strict";
+// Live-test helper only (not a PoC probe). Reads the P-04 OPFS marker WITHOUT
+// creating it, so it can test whether the marker survived a browser restart
+// or a file move. Opened from a different path than the probe, so it also
+// tests whether OPFS under file:// is keyed per-path or shared.
+var log = document.getElementById("log");
+function say(s){ log.textContent += "\n" + s; }
+say("location.origin: " + location.origin);
+(async function(){
+  try {
+    var dir = await navigator.storage.getDirectory();
+    say("getDirectory(): OK");
+    try {
+      var fh = await dir.getFileHandle("pa-amb-p04-marker.txt"); // no create
+      var f = await fh.getFile();
+      say("marker exists: YES");
+      say("marker content: " + (await f.text()).trim());
+    } catch(e){ say("marker exists: NO (" + e.name + ": " + e.message + ")"); }
+    var est = await navigator.storage.estimate();
+    say("storage estimate: quota=" + est.quota + " usage=" + est.usage);
+  } catch(e){ say("ERROR: " + e.name + ": " + e.message); }
+  say("READER DONE");
+})();
+</script></body></html>

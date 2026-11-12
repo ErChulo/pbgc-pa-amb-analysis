@@ -1,0 +1,215 @@
+{
+  "identity": {
+    "node": "v24.22.1",
+    "playwright": "1.65.0",
+    "platform": "linux x64",
+    "chromium": "158.0.8127.18",
+    "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.18 Safari/537.36",
+    "platformDetail": "Linux x86_64"
+  },
+  "probes": {
+    "p06": {
+      "origin": "location.origin: file:// (expect 'null')",
+      "fetch": "fetch: failed as expected: TypeError: Failed to fetch",
+      "instantiateStreaming": "instantiateStreaming: failed as expected: TypeError: Failed to fetch",
+      "dynamicImport": "ES module import: failed as expected: TypeError: Failed to fetch dynamically imported module: file:///home/hatch/workspace/pbgc-pa-amb-analysis/stage3/poc/poc-p06-module.js",
+      "staticImportConsole": [
+        "error: Access to script at 'file:///home/hatch/workspace/pbgc-pa-amb-analysis/stage3/poc/poc-p06-module.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: chrome, chrome-untrusted, data, http, https.",
+        "error: Access to script at 'file:///home/hatch/workspace/pbgc-pa-amb-analysis/stage3/poc/poc-p06-module.js' from origin 'null' has been blocked by CORS policy: Cross origin requests are only supported for protocol schemes: chrome, chrome-untrusted, data, http, https."
+      ],
+      "pageErrors": [],
+      "failedRequests": [
+        "file:///home/hatch/workspace/pbgc-pa-amb-analysis/stage3/poc/poc-p06-module.js :: net::ERR_FAILED",
+        "file:///home/hatch/workspace/pbgc-pa-amb-analysis/stage3/poc/poc-p06-module.js :: net::ERR_FAILED"
+      ],
+      "pass": true
+    },
+    "p01": {
+      "first": {
+        "label": "first launch",
+        "add": "add(2,3) = 5  (expect 5)",
+        "instantiateMs": "instantiate ms: 6.20",
+        "result": "P-01 RESULT: PASS",
+        "wallMs": 79,
+        "consoleErrors": [],
+        "pageErrors": [],
+        "pass": true
+      },
+      "afterRestart": {
+        "label": "after browser restart",
+        "add": "add(2,3) = 5  (expect 5)",
+        "instantiateMs": "instantiate ms: 9.70",
+        "result": "P-01 RESULT: PASS",
+        "consoleErrors": [],
+        "pageErrors": [],
+        "pass": true
+      },
+      "pass": true
+    },
+    "p02": {
+      "log": "running…\nwasm bytes: 17165, base64 chars: 22888\nexports: memory, accrual_monthly_cents, add, count_outside, delta_cents, sum_i64\nadd(2,3) = 5 (expect 5)\naccrual(150,20000,500000) = 150000 (expect 150000 cents = $1500.00)\ndelta(150000,149500) = 500 (expect 500)\ninstantiate ms: 6.50\nP-02 RESULT: PASS (if values above match and page stayed interactive)",
+      "navToPassMs": 77,
+      "roundTripMs": 2,
+      "probeValues": {
+        "add": "add(2,3) = 5 (expect 5)",
+        "accrual": "accrual(150,20000,500000) = 150000 (expect 150000 cents = $1500.00)",
+        "delta": "delta(150000,149500) = 500 (expect 500)",
+        "instantiateMs": "instantiate ms: 6.50"
+      },
+      "allFiveExports": {
+        "add": 5,
+        "accrual": "150000",
+        "delta": "500",
+        "sum": "600",
+        "countOutside": "2"
+      },
+      "expected": {
+        "add": 5,
+        "accrual": "150000",
+        "delta": "500",
+        "sum": "600",
+        "countOutside": "2"
+      },
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pass": true
+    },
+    "p03": {
+      "log": "running…\nblob URL created: blob:null/b74a4ada-3df9-4556-aae2-8f1fe1…\nworker replied: {\"type\":\"pong\",\"echo\":\"hello\"}\nworker replied: {\"type\":\"wasm-result\",\"value\":5}\nP-03 RESULT: PASS",
+      "pong": "worker replied: {\"type\":\"pong\",\"echo\":\"hello\"}",
+      "wasmResult": "worker replied: {\"type\":\"wasm-result\",\"value\":5}",
+      "result": "P-03 RESULT: PASS",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pass": true
+    },
+    "p04": {
+      "run1": {
+        "origin": "location.origin: file://",
+        "secureContext": "isSecureContext: true",
+        "marker": "(no marker line)",
+        "estimate": "(no estimate line)",
+        "result": "P-04 main-thread RESULT: FAIL"
+      },
+      "afterRestartDifferentPath": "running…\nlocation.origin: file://\nERROR: SecurityError: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources.\nREADER DONE",
+      "afterRestartSameDir": "running…\nlocation.origin: file://\nERROR: SecurityError: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources.\nREADER DONE",
+      "afterMoveDifferentPath": "running…\nlocation.origin: file://\nERROR: SecurityError: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources.\nREADER DONE",
+      "afterMoveSameDir": "running…\nlocation.origin: file://\nERROR: SecurityError: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources.\nREADER DONE",
+      "movedProbeLog": "running…\nisSecureContext: true\nlocation.origin: file://\nnavigator.storage present: true\nmain-thread ERROR: SecurityError: It was determined that certain files are unsafe for access within a Web application, or that too many calls are being made on file resources.\nP-04 main-thread RESULT: FAIL\n--- restart + rename checks are manual: reopen this file after closing Edge, then after renaming/moving it, and record whether the marker survives ---\nP-04 OVERALL: NEEDS LIVE file:// BROWSER TEST (restart + rename steps are manual)",
+      "pass": false
+    },
+    "p05": {
+      "run1": "running…\nlocalStorage usable: true\nprevious localStorage marker: (none — first run or did not survive)\nlocalStorage marker written; read back: written 2026-11-12T16:09:13.478Z\n--- manual: reopen after browser restart, then after renaming/moving this file; record survival + whether another local HTML file can see the marker ---\nP-05 OVERALL: NEEDS LIVE file:// BROWSER TEST",
+      "afterRestart": {
+        "log": "running…\nlocalStorage usable: true\nprevious localStorage marker: written 2026-11-12T16:09:13.478Z\nlocalStorage marker written; read back: written 2026-11-12T16:09:13.970Z\n--- manual: reopen after browser restart, then after renaming/moving this file; record survival + whether another local HTML file can see the marker ---\nP-05 OVERALL: NEEDS LIVE file:// BROWSER TEST",
+        "previousMarker": "previous localStorage marker: written 2026-11-12T16:09:13.478Z"
+      },
+      "crossFileDifferentPath": "running…\nlocation.origin: file://\nlocalStorage marker: written 2026-11-12T16:09:13.970Z\nIndexedDB: onupgradeneeded fired (DB did not exist at version 1)\nIndexedDB: no object store 's'\nREADER DONE",
+      "crossFileSameDir": "running…\nlocation.origin: file://\nlocalStorage marker: written 2026-11-12T16:09:13.970Z\nIndexedDB: no object store 's'\nREADER DONE",
+      "afterMove": {
+        "log": "running…\nlocalStorage usable: true\nprevious localStorage marker: written 2026-11-12T16:09:13.970Z\nlocalStorage marker written; read back: written 2026-11-12T16:09:14.561Z\n--- manual: reopen after browser restart, then after renaming/moving this file; record survival + whether another local HTML file can see the marker ---\nP-05 OVERALL: NEEDS LIVE file:// BROWSER TEST\nstorage estimate: quota=10737418830 usage=590",
+        "previousMarker": "previous localStorage marker: written 2026-11-12T16:09:13.970Z"
+      },
+      "crossFileAfterMove": "running…\nlocation.origin: file://\nlocalStorage marker: written 2026-11-12T16:09:14.561Z\nIndexedDB: no object store 's'\nREADER DONE",
+      "pass": true,
+      "followup": {
+        "run1": {
+          "localStorage": "localStorage usable: true",
+          "indexedDB": "IndexedDB opened OK | IndexedDB marker read back: written 2026-11-12T16:10:22.531Z"
+        },
+        "afterRestart": {
+          "previousLocalStorage": "previous localStorage marker: written 2026-11-12T16:10:22.098Z",
+          "indexedDB": "IndexedDB opened OK | IndexedDB marker read back: written 2026-11-12T16:10:22.990Z"
+        },
+        "crossFileReader": "running…\nlocation.origin: file://\nlocalStorage marker: written 2026-11-12T16:10:22.962Z\nIndexedDB marker: written 2026-11-12T16:10:22.990Z\nREADER DONE"
+      }
+    },
+    "p07": {
+      "json": {
+        "suggestedName": "pa-amb-p07-case.json",
+        "savedBytes": 78,
+        "content": "{\n  \"formatVersion\": \"1.0.0\",\n  \"case\": \"SYNTHETIC-P07\",\n  \"participants\": 3\n}",
+        "matches": true
+      },
+      "csv": {
+        "suggestedName": "pa-amb-p07-reconciliation.csv",
+        "savedBytes": 98,
+        "content": "participantKey,paAmbCents,reconCents,deltaCents\nSYN-001,150000,150000,0\nSYN-002,150000,149500,500\n",
+        "matches": true
+      },
+      "pass": true
+    },
+    "p08": {
+      "zeroFetch": {
+        "total": 2,
+        "httpLike": 0,
+        "httpUrls": [],
+        "fileDocRequests": 2
+      },
+      "wasmKernel": {
+        "total": 2,
+        "httpLike": 0,
+        "httpUrls": [],
+        "fileDocRequests": 2
+      },
+      "pass": true
+    },
+    "p09": {
+      "dark": {
+        "bodyBg": "rgb(0, 0, 0)",
+        "bodyFg": "rgb(242, 240, 233)",
+        "thBg": "rgb(10, 31, 68)",
+        "rows": 1000,
+        "status": "Dark theme (default). Toggle switches without reload. 1000 rows rendered in 11.0 ms.",
+        "math": true
+      },
+      "light": {
+        "bodyBg": "rgb(255, 255, 255)",
+        "bodyFg": "rgb(26, 26, 26)",
+        "thBg": "rgb(0, 45, 114)",
+        "theme": "light"
+      },
+      "backDark": {
+        "bodyBg": "rgb(0, 0, 0)",
+        "bodyFg": "rgb(242, 240, 233)",
+        "theme": "dark"
+      },
+      "httpRequests": 0,
+      "pass": true
+    },
+    "p10": {
+      "log": "waiting for file…\nfile: poc-p10-synthetic-100000.csv (6305426 bytes)\nheap before import: 9.5 MB\nimported rows: 100000 (expect 100000), chunks: 10\nimport ms: 117.7\nheap after import: 9.5 MB\ncalc+reconciliation ms: 18.2\ntotal (import+calc) ms: 135.9\nexact: 95023, bounds (missing avg): 4977\nwithin $5 tolerance: 87831, outside: 7192\nPA inside bounds: 3010, outside: 1967\nmean |delta|: $1.00, max |delta|: $20.00\nheap after calc: 9.5 MB\nP-10 BROWSER RESULT: PASS (completed without freezing)",
+      "importMs": "import ms: 117.7",
+      "calcMs": "calc+reconciliation ms: 18.2",
+      "totalMs": "total (import+calc) ms: 135.9",
+      "counts": "exact: 95023, bounds (missing avg): 4977",
+      "tolerance": "within $5 tolerance: 87831, outside: 7192",
+      "bounds": "PA inside bounds: 3010, outside: 1967",
+      "meanMax": "mean |delta|: $1.00, max |delta|: $20.00",
+      "heapBefore": "heap before import: 9.5 MB",
+      "heapAfterImport": "heap after import: 9.5 MB",
+      "heapAfterCalc": "heap after calc: 9.5 MB",
+      "consoleErrors": [],
+      "pageErrors": [],
+      "pass": true,
+      "followup": {
+        "rssBeforeMB": 387.4375,
+        "rssAfterMB": 442.484375,
+        "peakRssMB": 438.40625,
+        "samples": 1,
+        "importMs": "import ms: 116.5",
+        "calcMs": "calc+reconciliation ms: 12.8",
+        "totalMs": "total (import+calc) ms: 129.3"
+      },
+      "rss": {
+        "beforeMB": 96.5,
+        "peakMB": 103.9,
+        "afterMB": 102.9,
+        "samples": 5,
+        "method": "sum of RSS of Chromium processes whose command line contains the test browser's user-data-dir, sampled every 50 ms"
+      }
+    }
+  },
+  "stopCondition": false,
+  "notes": []
+}

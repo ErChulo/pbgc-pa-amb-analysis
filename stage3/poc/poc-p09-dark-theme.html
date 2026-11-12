@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>P-09 dark theme probe (file://)</title>
+<style>
+/* P-09 probe. Theme as CSS custom properties on the app root; the toggle is a
+   one-attribute switch (data-theme). No external font/CSS dependency. */
+:root, [data-theme="dark"] {
+  --bg: #000000; --fg: #f2f0e9; --muted: #b8b5ac; --accent: #7fb3ff;
+  --row-alt: #141414; --border: #333333; --header-bg: #0a1f44;
+}
+[data-theme="light"] {
+  --bg: #ffffff; --fg: #1a1a1a; --muted: #555555; --accent: #002d72;
+  --row-alt: #f2f2f2; --border: #cccccc; --header-bg: #002d72;
+}
+body { background: var(--bg); color: var(--fg); font-family: Arial, Helvetica, sans-serif; margin: 16px; }
+h1 { font-size: 20px; } table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th, td { border: 1px solid var(--border); padding: 3px 6px; text-align: right; }
+th { background: var(--header-bg); color: #ffffff; text-align: left; }
+tr:nth-child(even) td { background: var(--row-alt); }
+a, .accent { color: var(--accent); } .muted { color: var(--muted); }
+button { background: var(--header-bg); color: #fff; border: 1px solid var(--border); padding: 6px 12px; cursor: pointer; }
+</style></head>
+<body data-theme="dark">
+<h1>P-09: dark theme + toggle + 1,000-row table</h1>
+<p><button id="toggle">Switch to light theme</button> <span class="muted" id="status">Dark theme (default). Toggle switches without reload.</span></p>
+<p>Math notation sample (semantic HTML baseline, no KaTeX dependency): <i>B<sub>t</sub></i> = &alpha; &middot; <i>S<sub>t</sub></i> &middot; <i>C&#772;<sub>t</sub></i>, &nbsp; &Delta;<sub><i>i</i></sub> = <i>B<sub>i</sub><sup>PA</sup></i> &minus; <i>B&#770;<sub>i</sub></i></p>
+<table id="t"><thead><tr><th>Participant</th><th>PA_AMB (cents)</th><th>Recon (cents)</th><th>&Delta; (cents)</th><th>Disposition</th></tr></thead><tbody id="tb"></tbody></table>
+<script>
+"use strict";
+// 1,000 synthetic rows generated in-page (no external data). Deterministic:
+// paAmb cycles 100000..199000 cents; recon = paAmb - (i%7)*100; disposition
+// from |delta| vs a documented case tolerance of 500 cents.
+var tb = document.getElementById("tb");
+var t0 = performance.now();
+var html = "";
+for (var i = 0; i < 1000; i++) {
+  var pa = 100000 + (i % 100) * 1000;
+  var delta = (i % 7) * 100;
+  var recon = pa - delta;
+  var disp = Math.abs(delta) <= 500 ? "Verified" : "Requires investigation";
+  html += "<tr><td>SYN-" + String(i + 1).padStart(4, "0") + "</td><td>" + pa + "</td><td>" + recon + "</td><td>" + delta + "</td><td>" + disp + "</td></tr>";
+}
+tb.innerHTML = html;
+var t1 = performance.now();
+document.getElementById("status").textContent += " 1000 rows rendered in " + (t1 - t0).toFixed(1) + " ms.";
+document.getElementById("toggle").onclick = function () {
+  var b = document.body;
+  var dark = b.getAttribute("data-theme") === "dark";
+  b.setAttribute("data-theme", dark ? "light" : "dark");
+  this.textContent = dark ? "Switch to dark theme" : "Switch to light theme";
+};
+</script></body></html>
