@@ -1,0 +1,94 @@
+{
+  "n": 100000,
+  "csvBytes": 6305426,
+  "phases": {
+    "importMs": 3948.385568,
+    "validationMs": 0.006860999999844353,
+    "calculateMs": 46367.773534,
+    "reconcileMs": 773.1474249999956,
+    "statisticsMs": 10630.697073000003,
+    "modelFitMs": 228.76328300000023,
+    "modelFitNote": "OLS ready: n=95023, R²=0.0000",
+    "reportCsvMs": 100.89091600000393,
+    "reportXlsxMs": 10918.056941999996,
+    "reportHtmlMs": 1342.8103049999918,
+    "incrementalCalcOneMs": 1.0427440000057686,
+    "incrementalReconcileOneMs": 0.04189300000143703,
+    "incrementalStatsRerunMs": 8053.974239999996,
+    "incrementalCsvRebuildMs": 121.41362999999546,
+    "incrementalTotalMs": 8176.472506999999
+  },
+  "counts": {
+    "exact": 95023,
+    "bounds": 4977,
+    "indeterminate": 0,
+    "indeterminateReasons": {},
+    "withinTolerance": 86077,
+    "outsideTolerance": 8946,
+    "notComparable": 4977,
+    "paInsideBounds": 1180,
+    "paOutsideBounds": 3797,
+    "outlierFlags": 21062,
+    "outlierExplainedByGroup": 0,
+    "meanAbsDeltaMinor": 101,
+    "maxAbsDeltaMinor": 2001,
+    "validationRulesEvaluated": 0,
+    "validationFindings": 0,
+    "csvBytesOut": 6569316,
+    "xlsxBytesOut": 45998381,
+    "reportHtmlChars": 4568
+  },
+  "dispositions": {
+    "verified": 86077,
+    "requires-investigation": 13923
+  },
+  "memory": {
+    "start": {
+      "rssMB": 70.66796875,
+      "heapUsedMB": 15.51519775390625,
+      "heapTotalMB": 23.69921875
+    },
+    "afterImport": {
+      "rssMB": 1276.8203125,
+      "heapUsedMB": 1120.9840850830078,
+      "heapTotalMB": 1199.13671875
+    },
+    "afterValidation": {
+      "rssMB": 1276.8203125,
+      "heapUsedMB": 1120.9863815307617,
+      "heapTotalMB": 1199.13671875
+    },
+    "afterCalculate": {
+      "rssMB": 1891.48828125,
+      "heapUsedMB": 1731.5770721435547,
+      "heapTotalMB": 1829.76171875
+    },
+    "afterReconcile": {
+      "rssMB": 1949.5703125,
+      "heapUsedMB": 1762.2653121948242,
+      "heapTotalMB": 1881.37890625
+    },
+    "afterStatistics": {
+      "rssMB": 2061.109375,
+      "heapUsedMB": 1030.325798034668,
+      "heapTotalMB": 1677.9375
+    },
+    "afterReport": {
+      "rssMB": 1206.296875,
+      "heapUsedMB": 937.2294769287109,
+      "heapTotalMB": 1077.28125
+    },
+    "end": {
+      "rssMB": 1300.375,
+      "heapUsedMB": 1081.1397705078125,
+      "heapTotalMB": 1159.91015625
+    }
+  },
+  "notes": [
+    "validation skipped by probe option (P-16 is O(n²); see findings file §4)"
+  ],
+  "wallMs": 82596,
+  "peakRssMB": 2384,
+  "engine": "node",
+  "nodeVersion": "v24.22.1"
+}

@@ -1,0 +1,210 @@
+{
+  "checks": [
+    {
+      "name": "L1a booted with no page/console errors (load + reload)",
+      "pass": true,
+      "evidence": "errors: none; failed requests: none"
+    },
+    {
+      "name": "L1b 0 http/https requests across load + reload",
+      "pass": true,
+      "evidence": "0 http/https; 2 total request(s), all file://: yes"
+    },
+    {
+      "name": "L1c every recorded request is a file:// document load",
+      "pass": true,
+      "evidence": "non-file requests: none"
+    },
+    {
+      "name": "L2a demo case loads (Harborview, 6 SYN participants)",
+      "pass": true,
+      "evidence": "6 participants"
+    },
+    {
+      "name": "L2b validate: 6 results, rules evaluated",
+      "pass": true,
+      "evidence": "6 results, 405 rules, 145 findings"
+    },
+    {
+      "name": "L2c calculate: SYN-001 exact $1,500.00, SYN-V-01 $849.50, bounds + indeterminate",
+      "pass": true,
+      "evidence": "SYN-001 exact/150000; SYN-002 bounds 158400-168300; SYN-I-01 indeterminate"
+    },
+    {
+      "name": "L2d determinism: second calculation run is byte-identical to the first",
+      "pass": true,
+      "evidence": "calc run 1 === calc run 2 (JSON)"
+    },
+    {
+      "name": "L2e reconcile: SYN-003 delta $1,000.00 outside tolerance",
+      "pass": true,
+      "evidence": "SYN-003 delta 100000; SYN-001 delta 0"
+    },
+    {
+      "name": "L2f statistics: SYN-003 flagged by modified-z, population 6",
+      "pass": true,
+      "evidence": "n=6; flags: SYN-003/modified-z,SYN-001/percentile,SYN-003/percentile"
+    },
+    {
+      "name": "L2g decide: all six recommended, none refused",
+      "pass": true,
+      "evidence": "SYN-001:verified/recommended SYN-002:requires-investigation/recommended SYN-003:requires-investigation/recommended SYN-004:requires-investigation/recommended SYN-V-01:verified/recommended SYN-I-01:indeterminate/recommended"
+    },
+    {
+      "name": "L2h legitimate human approval applies (A. Actuary, verified)",
+      "pass": true,
+      "evidence": "approved/verified; refusal: null"
+    },
+    {
+      "name": "L2i publish contribution (protocol v0.1.0, findings present)",
+      "pass": true,
+      "evidence": "1 findings, 0 fragments"
+    },
+    {
+      "name": "L2j 0 http/https requests across the FULL wizard run",
+      "pass": true,
+      "evidence": "0 http/https; 2 total requests recorded"
+    },
+    {
+      "name": "L2k every request in the full run is file://",
+      "pass": true,
+      "evidence": "non-file: none"
+    },
+    {
+      "name": "L2l all 9 invariants hold after the full run",
+      "pass": true,
+      "evidence": "Pass: 9, Fail: 0"
+    },
+    {
+      "name": "L3a audit-log download filename",
+      "pass": true,
+      "evidence": "00098765-audit-log.json"
+    },
+    {
+      "name": "L3b audit log holds the 7 disposition events AND the calculation-run/import events (Stage 7 fix: step completions are audited)",
+      "pass": true,
+      "evidence": "29 events: {\"import\":1,\"calculation-run\":21,\"disposition-proposed\":6,\"disposition-approved\":1}"
+    },
+    {
+      "name": "L3c every approval is in the audit log (1 approval, SYN-001, reviewer A. Actuary)",
+      "pass": true,
+      "evidence": "Disposition verified approved by A. Actuary."
+    },
+    {
+      "name": "L3d calculations ARE in the exported audit log (Stage 7 fix: calculation-run events are audited)",
+      "pass": true,
+      "evidence": "auditLog=29 events, eventLog=36 events (import-case-package, validation-completed, calculation-completed, reconciliation-completed, statistics-completed, evidence-recorded, analysis-event, contribution-published, wizard-go-to); calculation-run events in audit log: 21"
+    },
+    {
+      "name": "L3e validation/calculation/reconciliation/statistics/import are in the in-memory eventLog (and, Stage 7 fix, also audited as calculation-run/import)",
+      "pass": true,
+      "evidence": "eventLog kinds: import-case-package, validation-completed, calculation-completed, reconciliation-completed, statistics-completed, evidence-recorded, analysis-event, contribution-published, wizard-go-to"
+    },
+    {
+      "name": "L4a CSV export shows the §19 warning dialog with the exact warning text",
+      "pass": true,
+      "evidence": "type=confirm, text matches: true"
+    },
+    {
+      "name": "L4b CSV downloads after accepting the warning",
+      "pass": true,
+      "evidence": "00098765-reconciliation.csv"
+    },
+    {
+      "name": "L4c CSV content is the reconciliation (6 rows, SYN-003 delta 100000)",
+      "pass": true,
+      "evidence": "7 data rows"
+    },
+    {
+      "name": "L4d dismissing the warning blocks the CSV export (no download)",
+      "pass": true,
+      "evidence": "download: none (blocked); dialogs: 1"
+    },
+    {
+      "name": "L4e XLSX export shows the §19 warning dialog and downloads on accept",
+      "pass": true,
+      "evidence": "dialogs: 1; file: 00098765-reconciliation.xlsx"
+    },
+    {
+      "name": "L4f audit-log export shows a §19 warning dialog (Stage 7 fix)",
+      "pass": true,
+      "evidence": "dialogs on audit-log export: 1; file downloaded anyway: 00098765-audit-log.json"
+    },
+    {
+      "name": "L4g contribution-package export shows a §19 warning dialog (Stage 7 fix)",
+      "pass": true,
+      "evidence": "dialogs on contribution export: 1; file downloaded anyway: 00098765-amb-contribution.json"
+    },
+    {
+      "name": "L2m no page/console errors by end of run",
+      "pass": true,
+      "evidence": "errors: none; failed requests: none"
+    },
+    {
+      "name": "L5a approve with actor 'system' is refused (human-gate), stays recommended",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: only an authorized human reviewer may approve, reject, or re-open a disposition — the system may only recommend"
+    },
+    {
+      "name": "L5b approve with empty actor is refused (human-gate)",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: only an authorized human reviewer may approve, reject, or re-open a disposition — the system may only recommend"
+    },
+    {
+      "name": "L5c approve with reviewer 'system' is refused",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: the approver must be the reviewer named in the determination (reviewer-mismatch fires before the system-reviewer check in T3; the approval is refused either way)"
+    },
+    {
+      "name": "L5c2 approve where determination AND approval both name reviewer 'system' is refused by approveDetermination",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: approval refused — §14 item 10 (human determination, rationale, reviewer, and date) incomplete: reviewer is missing or is the system, not a human (§14 item 10 completeness refuses a 'system' reviewer before the approval gate is reached)"
+    },
+    {
+      "name": "L5d approve by someone other than the named reviewer is refused",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: the approver must be the reviewer named in the determination"
+    },
+    {
+      "name": "L5e approve with a false §4.2 confirmation is refused",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: determination approval refused: confirmation refused: entry conditions do not hold"
+    },
+    {
+      "name": "L5f approve with an empty determination rationale is refused (G-INV-7)",
+      "pass": true,
+      "evidence": "after=recommended/verified; refusal=SYN-001: approval refused — §14 item 10 (human determination, rationale, reviewer, and date) incomplete: rationale is missing or is the bare word \"agreed\" without a reason"
+    },
+    {
+      "name": "L5g T3 refuses an approval whose determination says 'verified' while the current disposition is requires-investigation (Stage 7 fix)",
+      "pass": true,
+      "evidence": "after=recommended/requires-investigation; refusal=SYN-003: the determination's humanDetermination says verified but the disposition being approved is requires-investigation — an approval must attach the determination for the disposition it approves"
+    },
+    {
+      "name": "L5g2 the mismatched approval was refused, so no valuation use was ever attached",
+      "pass": true,
+      "evidence": "refusal=SYN-003: the determination's humanDetermination says verified but the disposition being approved is requires-investigation — an approval must attach the determination for the disposition it approves"
+    },
+    {
+      "name": "L5h system propose stays a recommendation with NO downstream effect (by design)",
+      "pass": true,
+      "evidence": "after=recommended/verified; downstreamUse={\"usableInValuation\":false,\"valueCents\":null,\"valueKind\":\"none\",\"paAmbAccept\":null}"
+    },
+    {
+      "name": "L5i no approved disposition was created by the system (createdBy is a human in every case)",
+      "pass": true,
+      "evidence": "approved: none"
+    },
+    {
+      "name": "L5j no page errors during the attack run",
+      "pass": true,
+      "evidence": "errors: none"
+    },
+    {
+      "name": "L5k approve with no recommended disposition is refused (no transition row)",
+      "pass": true,
+      "evidence": "after=null; refusal=SYN-001: no evidence state exists for SYN-001 — run a calculation or bounds computation first"
+    }
+  ],
+  "failures": 0
+}

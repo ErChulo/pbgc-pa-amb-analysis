@@ -1,0 +1,105 @@
+{
+  "n": 1000,
+  "csvBytes": 63111,
+  "phases": {
+    "importMs": 46.799999999813735,
+    "validationMs": 210,
+    "calculateMs": 527.9000000003725,
+    "reconcileMs": 8.900000000372529,
+    "statisticsMs": 74.79999999981374,
+    "modelFitMs": 3.6000000000931323,
+    "modelFitNote": "OLS ready: n=944, R²=0.0008",
+    "reportCsvMs": 1.5,
+    "reportXlsxMs": 88.5,
+    "reportHtmlMs": 1.3000000002793968,
+    "incrementalCalcOneMs": 0.6000000000931323,
+    "incrementalReconcileOneMs": 0,
+    "incrementalStatsRerunMs": 79.1999999997206,
+    "incrementalCsvRebuildMs": 0.8000000002793968,
+    "incrementalTotalMs": 80.60000000009313
+  },
+  "counts": {
+    "exact": 944,
+    "bounds": 56,
+    "indeterminate": 0,
+    "indeterminateReasons": {},
+    "withinTolerance": 851,
+    "outsideTolerance": 93,
+    "notComparable": 56,
+    "paInsideBounds": 15,
+    "paOutsideBounds": 41,
+    "outlierFlags": 220,
+    "outlierExplainedByGroup": 0,
+    "meanAbsDeltaMinor": 107,
+    "maxAbsDeltaMinor": 1979,
+    "validationRulesEvaluated": 66009,
+    "validationFindings": 21619,
+    "csvBytesOut": 65853,
+    "xlsxBytesOut": 448294,
+    "reportHtmlChars": 4500
+  },
+  "dispositions": {
+    "verified": 851,
+    "requires-investigation": 149
+  },
+  "memory": {
+    "start": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterImport": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterValidation": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterCalculate": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterReconcile": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterStatistics": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "afterReport": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    },
+    "end": {
+      "rssMB": null,
+      "heapUsedMB": 9.5367431640625,
+      "heapTotalMB": 9.5367431640625
+    }
+  },
+  "notes": [],
+  "wallMs": 1062,
+  "engine": "browser",
+  "browser": "Chromium 158 (Playwright 1.65.0, headless shell, Linux, file://)",
+  "rss": {
+    "beforeMB": 96.54296875,
+    "peakMB": 102.12109375,
+    "afterMB": 102.12109375,
+    "samples": 22
+  },
+  "heap": {
+    "beforeMB": 0.48493194580078125,
+    "peakMB": 41.686553955078125,
+    "afterMB": 28.042869567871094,
+    "samples": 43
+  },
+  "peakRssMB": 102.12109375,
+  "peakHeapMB": 41.686553955078125
+}

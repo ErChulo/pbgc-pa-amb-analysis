@@ -1,0 +1,44 @@
+{
+  "n": 100,
+  "validateMs": 76,
+  "validateOut": {
+    "participantResults": 100,
+    "rulesEvaluated": 6609,
+    "findings": 2171
+  },
+  "calculateMs": 198.59999999962747,
+  "calculateOut": {
+    "calculated": 100
+  },
+  "reconcileMs": 240.20000000018626,
+  "reconcileOut": {
+    "reconciled": 100
+  },
+  "statisticsMs": 77.70000000018626,
+  "statisticsOut": {
+    "populationN": 100,
+    "flags": 24
+  },
+  "stateSizes": {
+    "eventLog": 202,
+    "calculations": 100,
+    "reconciliations": 100
+  },
+  "wizard": {
+    "currentStep": "import",
+    "completed": {
+      "import": false,
+      "validate": true,
+      "calculate": true,
+      "reconcile": true,
+      "statistics": true,
+      "decide": false,
+      "export": false
+    },
+    "mode": "wizard"
+  },
+  "wallMs": 602,
+  "heapPeakMB": 10.573009490966797,
+  "heapSamples": 30,
+  "engine": "browser-ui-path"
+}

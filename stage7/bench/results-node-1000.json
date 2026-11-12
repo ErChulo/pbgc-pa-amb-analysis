@@ -1,0 +1,92 @@
+{
+  "n": 1000,
+  "csvBytes": 63111,
+  "phases": {
+    "importMs": 36.764266000000006,
+    "validationMs": 274.669843,
+    "calculateMs": 491.697773,
+    "reconcileMs": 10.698588000000086,
+    "statisticsMs": 74.65799600000003,
+    "modelFitMs": 4.064085999999975,
+    "modelFitNote": "OLS ready: n=944, R²=0.0008",
+    "reportCsvMs": 1.6969350000000532,
+    "reportXlsxMs": 43.14102100000002,
+    "reportHtmlMs": 2.1740810000001147,
+    "incrementalCalcOneMs": 0.6838160000002063,
+    "incrementalReconcileOneMs": 0.03931899999997768,
+    "incrementalStatsRerunMs": 79.1152320000001,
+    "incrementalCsvRebuildMs": 1.0136099999999715,
+    "incrementalTotalMs": 80.85197700000026
+  },
+  "counts": {
+    "exact": 944,
+    "bounds": 56,
+    "indeterminate": 0,
+    "indeterminateReasons": {},
+    "withinTolerance": 851,
+    "outsideTolerance": 93,
+    "notComparable": 56,
+    "paInsideBounds": 15,
+    "paOutsideBounds": 41,
+    "outlierFlags": 220,
+    "outlierExplainedByGroup": 0,
+    "meanAbsDeltaMinor": 107,
+    "maxAbsDeltaMinor": 1979,
+    "validationRulesEvaluated": 66009,
+    "validationFindings": 21619,
+    "csvBytesOut": 65853,
+    "xlsxBytesOut": 448294,
+    "reportHtmlChars": 4500
+  },
+  "dispositions": {
+    "verified": 851,
+    "requires-investigation": 149
+  },
+  "memory": {
+    "start": {
+      "rssMB": 64.84375,
+      "heapUsedMB": 9.585853576660156,
+      "heapTotalMB": 17.18359375
+    },
+    "afterImport": {
+      "rssMB": 94.09375,
+      "heapUsedMB": 21.597061157226562,
+      "heapTotalMB": 51.43359375
+    },
+    "afterValidation": {
+      "rssMB": 132.21875,
+      "heapUsedMB": 38.333953857421875,
+      "heapTotalMB": 99.359375
+    },
+    "afterCalculate": {
+      "rssMB": 178.55078125,
+      "heapUsedMB": 60.497344970703125,
+      "heapTotalMB": 112.109375
+    },
+    "afterReconcile": {
+      "rssMB": 178.92578125,
+      "heapUsedMB": 65.69306182861328,
+      "heapTotalMB": 112.359375
+    },
+    "afterStatistics": {
+      "rssMB": 179.92578125,
+      "heapUsedMB": 76.65025329589844,
+      "heapTotalMB": 114.109375
+    },
+    "afterReport": {
+      "rssMB": 192.890625,
+      "heapUsedMB": 67.6485366821289,
+      "heapTotalMB": 126.515625
+    },
+    "end": {
+      "rssMB": 185.66015625,
+      "heapUsedMB": 68.08679962158203,
+      "heapTotalMB": 118.859375
+    }
+  },
+  "notes": [],
+  "wallMs": 1023,
+  "peakRssMB": 193.3,
+  "engine": "node",
+  "nodeVersion": "v24.22.1"
+}

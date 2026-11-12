@@ -1,0 +1,252 @@
+{
+  "results": [
+    {
+      "id": "P0-boot",
+      "pass": true,
+      "detail": "app booted via file://, no page errors, no failed requests"
+    },
+    {
+      "id": "P0-file-picker",
+      "pass": true,
+      "detail": "input[type=file] count = 1; file picker present (Stage 7 Robustness D3 fix — was gap G-ACC-3)"
+    },
+    {
+      "id": "P1-demo-load",
+      "pass": true,
+      "detail": "6 demo participants loaded (got 6)"
+    },
+    {
+      "id": "P1-validate",
+      "pass": true,
+      "detail": "405 rules, 145 findings, 6 results"
+    },
+    {
+      "id": "P1-SYN-001-exact",
+      "pass": true,
+      "detail": "exact $1500 (expected $1,500.00)"
+    },
+    {
+      "id": "P1-SYN-001-trace",
+      "pass": true,
+      "detail": "trace 18 steps, sequential 1..18, all 10 stages present: provisions-selected,participation,credited-service,vesting-percentage,compensation-year,compensation-year,compensation-year,average-compensation,base-formula,protection-evaluated-not-applied,restrictions-evaluated-not-applied,rounding,basis-conversion,normal-retirement-basis,comparison-basis,recorded-pa-amb,counterfactual,counterfactual"
+    },
+    {
+      "id": "P1-SYN-002-bounds",
+      "pass": true,
+      "detail": "bounds $1584–$1683, recorded $1,620 inside"
+    },
+    {
+      "id": "P1-SYN-003-exact",
+      "pass": true,
+      "detail": "exact $1500 (recorded $2,500.00)"
+    },
+    {
+      "id": "P1-SYN-004-bounds",
+      "pass": true,
+      "detail": "bounds $900–$960, recorded $930 inside"
+    },
+    {
+      "id": "P1-SYN-V-01-exact",
+      "pass": true,
+      "detail": "exact $849.5 (expected $849.50)"
+    },
+    {
+      "id": "P1-SYN-V-01-rounding-trace",
+      "pass": true,
+      "detail": "rounding step: output=849.5, ruleRef=plan §5.01, grade=fact"
+    },
+    {
+      "id": "P1-SYN-I-01-indeterminate",
+      "pass": true,
+      "detail": "indeterminate, reason unresolved-comparison-basis (DOTE blank; demo PA_AMB also blank)"
+    },
+    {
+      "id": "P1-recon-SYN-001",
+      "pass": true,
+      "detail": "Δ $0, within tolerance, recommended verified"
+    },
+    {
+      "id": "P1-recon-SYN-V-01",
+      "pass": true,
+      "detail": "Δ +$0.50, within tolerance, recommended verified"
+    },
+    {
+      "id": "P1-recon-SYN-003",
+      "pass": true,
+      "detail": "Δ +$1,000.00, outside tolerance, requires-investigation"
+    },
+    {
+      "id": "P1-recon-SYN-002-bounds",
+      "pass": true,
+      "detail": "bounds-inside SYN-002 recommended requires-investigation (material bound width; Node population oracle would say supported-for-acceptance for inside bounds — same divergence class as G-ACC-4)"
+    },
+    {
+      "id": "P1-recon-SYN-004-bounds",
+      "pass": true,
+      "detail": "bounds-inside SYN-004 recommended requires-investigation"
+    },
+    {
+      "id": "P1-recon-SYN-I-01",
+      "pass": true,
+      "detail": "not comparable, no Δ, recommended indeterminate"
+    },
+    {
+      "id": "P1-stats",
+      "pass": true,
+      "detail": "population n=6, modified-z flags SYN-003 (flags: SYN-003/modified-z,SYN-001/percentile,SYN-003/percentile)"
+    },
+    {
+      "id": "P1b-V-01-propose",
+      "pass": true,
+      "detail": "recommended verified (refusal: null)"
+    },
+    {
+      "id": "P1b-V-01-approve",
+      "pass": true,
+      "detail": "approved verified (refusal: null)"
+    },
+    {
+      "id": "P1b-V-01-paambaccept",
+      "pass": true,
+      "detail": "downstreamUse={\"usableInValuation\":true,\"valueCents\":85000,\"valueKind\":\"recorded\",\"paAmbAccept\":\"Y\"}"
+    },
+    {
+      "id": "P2-hv-exact",
+      "pass": true,
+      "detail": "exact $1067.5 (expected $1,067.50)"
+    },
+    {
+      "id": "P2-hv-basis",
+      "pass": true,
+      "detail": "monthly, vested, NSF, age 65"
+    },
+    {
+      "id": "P2-hv-delta",
+      "pass": true,
+      "detail": "Δ +$165.00 (recorded $1,232.50 − reconstructed $1,067.50)"
+    },
+    {
+      "id": "P2-hv-no-retroactive",
+      "pass": true,
+      "detail": "$55 on all 24.25y would be $1,333.75; $40 on all would be $970.00; got $1,067.50 — latest formula not applied retroactively"
+    },
+    {
+      "id": "P2-hv-counterfactual",
+      "pass": true,
+      "detail": "3 extra post-2003 years at $55 reproduces recorded $1,232.50 exactly (got $1232.5)"
+    },
+    {
+      "id": "P2-hv-loose-pipeline",
+      "pass": true,
+      "detail": "loose inputs through the pipeline price measured service 24.25y, not the stale call parameter 27.25y: 27.25y all at $55 would be $1,498.75, the pipeline returns $1,333.75 = 55 x 24.25 (Stage 5 guard: formula runs on Stage 3/4 measures, pipeline.test.ts). The direct $1,498.75 refutation via evaluateFormulaCall is Node-only (harborview.test.ts) — that function is not exposed on window.PaAmbApp."
+    },
+    {
+      "id": "P2-hv-no-decision",
+      "pass": true,
+      "detail": "calculation carries no disposition/determination — the match stays a hypothesis"
+    },
+    {
+      "id": "P2-hv-recon",
+      "pass": true,
+      "detail": "outside tolerance, recommended requires-investigation"
+    },
+    {
+      "id": "P3-I-01-scenarios",
+      "pass": true,
+      "detail": "1.50% [$1,500–$1,560], 1.25% [$1,250–$1,300]"
+    },
+    {
+      "id": "P3-I-01-outside",
+      "pass": true,
+      "detail": "recorded $1,120.00 below both scenario minima — a lead, not a conclusion"
+    },
+    {
+      "id": "P3-I-01-requests",
+      "pass": true,
+      "detail": "3 data requests, priorities 1,2,3, statuses issued,issued,not-issued"
+    },
+    {
+      "id": "P3-I-01-propose",
+      "pass": true,
+      "detail": "proposed indeterminate/recommended (refusal: null)"
+    },
+    {
+      "id": "P3-I-01-propose-downstream",
+      "pass": true,
+      "detail": "recommended downstreamUse={\"usableInValuation\":false,\"valueCents\":null,\"valueKind\":\"none\",\"paAmbAccept\":null}"
+    },
+    {
+      "id": "P3-I-01-approve-refused",
+      "pass": true,
+      "detail": "approval refused, status stays recommended/indeterminate, refusal: SYN-I-01: §5.2: the missing evidence must have been sought — every data request answered without resolving the gap, or the reviewer records why no further request can currently be made; a live request is still awaiting a response"
+    },
+    {
+      "id": "P4-I-01-exhausted-propose",
+      "pass": true,
+      "detail": "proposed indeterminate/recommended on exhausted search"
+    },
+    {
+      "id": "P4-I-01-exhausted-approve",
+      "pass": true,
+      "detail": "approved indeterminate (refusal: null)"
+    },
+    {
+      "id": "P4-I-01-exhausted-downstream",
+      "pass": true,
+      "detail": "approved downstreamUse={\"usableInValuation\":false,\"valueCents\":null,\"valueKind\":\"none\",\"paAmbAccept\":\"N\"}"
+    },
+    {
+      "id": "P5-pop-n",
+      "pass": true,
+      "detail": "browser computed 1000 participants in 1568 ms"
+    },
+    {
+      "id": "P5-pop-agrees-node",
+      "pass": true,
+      "detail": "all 1,000 browser rows match Node exactly (recon/recorded/Δ/kind/bounds)"
+    },
+    {
+      "id": "P5-pop-outliers-400",
+      "pass": true,
+      "detail": "flagged=400 (service 150, averaging 150, vesting 100); medianΔ=0, MAD=24.5; clean/rounding/missing cohorts: 0 flagged"
+    },
+    {
+      "id": "P5-pop-flags-agree-node",
+      "pass": true,
+      "detail": "browser flag set identical to Node flag set (400 keys)"
+    },
+    {
+      "id": "P5-pop-recommended-vs-oracle",
+      "pass": true,
+      "detail": "browser reconcile recommendations agree with the Node oracle — clean: {\"verified\":400} (Node oracle: verified); service: {\"correction-recommended\":150} (Node oracle: correction-recommended); averaging: {\"correction-recommended\":150} (Node oracle: correction-recommended); rounding: {\"verified\":100} (Node oracle: verified); vesting: {\"requires-investigation\":100} (Node oracle: requires-investigation)"
+    }
+  ],
+  "population": {
+    "ms": 1568,
+    "medianDelta": 0,
+    "mad": 24.5,
+    "flaggedTotal": 400,
+    "flaggedByCohort": {
+      "service": 150,
+      "averaging": 150,
+      "vesting": 100
+    },
+    "recommendedByCohort": {
+      "clean": {
+        "verified": 400
+      },
+      "service": {
+        "correction-recommended": 150
+      },
+      "averaging": {
+        "correction-recommended": 150
+      },
+      "rounding": {
+        "verified": 100
+      },
+      "vesting": {
+        "requires-investigation": 100
+      }
+    }
+  }
+}

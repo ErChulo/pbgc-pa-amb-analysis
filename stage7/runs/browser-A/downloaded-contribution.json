@@ -1,0 +1,57 @@
+{
+  "contributionProtocolVersion": "0.1.0",
+  "productId": "AMB",
+  "productVersion": "0.1.0",
+  "caseId": "case-demo",
+  "producedAt": "2026-11-12T00:00:00.000Z",
+  "publishedBy": "demo",
+  "sourceSnapshotId": "demo-synthetic-no-file",
+  "calculationRunId": "run-demo-1",
+  "status": "draft",
+  "findings": [
+    {
+      "findingId": "amb:run-demo-1:calculation",
+      "caseId": "case-demo",
+      "originatingWorkProduct": "AMB",
+      "originatingVersion": "0.1.0 / run-demo-1",
+      "claimType": "derived_result",
+      "subjectScope": "participant",
+      "subjectIds": [
+        "calc-pv-demo-1985-2020-02-29"
+      ],
+      "effectivePeriod": {
+        "start": "2020-02-29",
+        "end": "2020-02-29"
+      },
+      "valueAndUnits": {
+        "value": "1500",
+        "units": "USD/month",
+        "basis": "measured dote 2020-02-29"
+      },
+      "findingStatement": "Reconstructed accrued benefit is $1500.00 per monthly for participant calc-pv-demo-1985-2020-02-29 at 2020-02-29.",
+      "rationale": "Calculation run run-demo-1 (engine 0.1.0, rule version 0.1.0), 18 trace steps; final step \"counterfactual\" (Stage 10: counterfactual H2 tested).",
+      "evidenceRefs": [],
+      "missingEvidenceException": "No EvidenceRef supplied for calculation run run-demo-1; the calculation trace (18 steps) is the derivation record, not a cited source.",
+      "derivedFromFindingIds": [],
+      "reviewState": "draft",
+      "materiality": {
+        "material": true,
+        "rule": null
+      },
+      "intendedR1Topics": [
+        "data_issues",
+        "benefit_formula"
+      ],
+      "supersedes": null
+    }
+  ],
+  "fragments": [],
+  "citations": [],
+  "warnings": [],
+  "requiredFollowups": [
+    "Finding amb:run-demo-1:calculation was published without cited evidence: No EvidenceRef supplied for calculation run run-demo-1; the calculation trace (18 steps) is the derivation record, not a cited source.. The missing-evidence exception is recorded on the finding; resolve the evidence or withdraw the finding before final use."
+  ],
+  "downstreamDependencies": [
+    "R1"
+  ]
+}
