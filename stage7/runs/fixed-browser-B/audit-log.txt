@@ -1,0 +1,7 @@
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition verified proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition verified proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition indeterminate proposed (recommended).
+2026-11-12T00:00:00.000Z | A. Actuary | disposition-approved | Disposition verified approved by A. Actuary.

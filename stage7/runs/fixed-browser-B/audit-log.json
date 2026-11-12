@@ -1,0 +1,102 @@
+[
+  {
+    "auditEventId": "ui-propose-SYN-001-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Disposition verified proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "verified"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-002-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-002"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-003-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-003"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-004-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-004"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-V-01-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-V-01"
+    ],
+    "summary": "Disposition verified proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "verified"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-I-01-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-I-01"
+    ],
+    "summary": "Disposition indeterminate proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "indeterminate"
+    }
+  },
+  {
+    "auditEventId": "ui-approve-SYN-001-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "A. Actuary",
+    "kind": "disposition-approved",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Disposition verified approved by A. Actuary.",
+    "detail": {
+      "fromDisposition": "verified",
+      "toDisposition": "verified",
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  }
+]
