@@ -1,0 +1,23 @@
+2026-11-12T00:00:00.000Z | user | import | Case case-demo imported (6 participants, snapshot demo-synthetic-no-file).
+2026-11-12T00:00:00.000Z | demo | calculation-run | Validation completed: 405 rules evaluated, 145 findings across 6 participants.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-001: exact 150000 minor units.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-002: bounds 158400–168300 minor units.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-003: exact 150000 minor units.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-004: bounds 90000–96000 minor units.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-V-01: exact 84950 minor units.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Calculation completed for SYN-I-01: indeterminate ([object Object]).
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-001: Δ 0 minor units, within-tolerance, recommended verified.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-002: not comparable (bounds-only), recommended requires-investigation.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-003: Δ 100000 minor units, outside-tolerance, recommended requires-investigation.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-004: not comparable (bounds-only), recommended requires-investigation.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-V-01: Δ 50 minor units, within-tolerance, recommended verified.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Reconciliation completed for SYN-I-01: not comparable (unresolved-comparison-basis), recommended indeterminate.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Statistics completed: population n=6, outlier flags 3.
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition verified proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition requires-investigation proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition verified proposed (recommended).
+2026-11-12T00:00:00.000Z | system | disposition-proposed | Disposition indeterminate proposed (recommended).
+2026-11-12T00:00:00.000Z | A. Actuary | disposition-approved | Disposition verified approved by A. Actuary.
+2026-11-12T00:00:00.000Z | demo | calculation-run | Contribution package published (AMB v0.1.0, 1 findings).

@@ -1,0 +1,7 @@
+participantKey,recordedMinor,reconstructedMinor,deltaMinor,absDeltaMinor,relDelta,toleranceVerdict,recommendedDisposition
+SYN-001,150000,150000,0,0,0,within-tolerance,verified
+SYN-002,162000,,,,,not-applicable,requires-investigation
+SYN-003,250000,150000,100000,100000,0.6666666667,outside-tolerance,requires-investigation
+SYN-004,93000,,,,,not-applicable,requires-investigation
+SYN-V-01,85000,84950,50,50,0.0005885815,within-tolerance,verified
+SYN-I-01,,,,,,not-applicable,indeterminate
