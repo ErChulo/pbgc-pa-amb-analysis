@@ -17,9 +17,9 @@
  *   formatting is exact decimal text, never a recomputed money amount.
  * - Theme: CSS variables only (var(--fg), var(--muted), var(--accent),
  *   var(--border), var(--bg)) — never hardcoded theme colors — so charts
- *   are legible in both the dark theme (bg #000000, fg #f2f0e9, accent
- *   #7fb3ff) and the light theme (bg #ffffff, fg #1a1a1a, accent
- *   #002d72). Flagged points are distinguished by shape as well as
+ *   are legible in both themes under the PBGC Design System v1.1.0
+ *   tokens (dark: provisional DS §2.5; light: DS §2.3). Flagged points
+ *   are distinguished by shape as well as
  *   colour, so the flag never depends on colour alone.
  * - Every chart labels its denominator, units, dates, and participant
  *   population in the title/subtitle (MASTER_PROMPT §15). The caller
@@ -153,7 +153,7 @@ function svgOpen(opts: FrameOpts): string {
     `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${opts.height}" ` +
       `viewBox="0 0 ${width} ${opts.height}" role="img" ` +
       `aria-label="${escapeXml(opts.title)}" ` +
-      `font-family="Arial, Helvetica, sans-serif" font-size="12" ` +
+      `font-family="Helvetica Neue, Arial, sans-serif" font-size="14" ` +
       `fill="var(--fg)" style="background:var(--bg)">`,
   );
   parts.push(`<title>${escapeXml(opts.title)}</title>`);
@@ -163,7 +163,7 @@ function svgOpen(opts: FrameOpts): string {
   );
   if (opts.subtitle !== undefined && opts.subtitle.trim().length > 0) {
     parts.push(
-      `<text x="16" y="40" font-size="11" fill="var(--muted)">${escapeXml(opts.subtitle)}</text>`,
+      `<text x="16" y="40" font-size="14" fill="var(--muted)">${escapeXml(opts.subtitle)}</text>`,
     );
   }
   return parts.join("");
@@ -180,7 +180,7 @@ function svgClose(): string {
 function noDataSvg(opts: FrameOpts): string {
   return (
     svgOpen(opts) +
-    `<text x="16" y="80" font-size="12" fill="var(--muted)">No data: nothing to chart.</text>` +
+    `<text x="16" y="80" font-size="14" fill="var(--muted)">No data: nothing to chart.</text>` +
     svgClose()
   );
 }
@@ -318,21 +318,21 @@ export function renderHistogram(
     );
     if (count > 0) {
       parts.push(
-        `<text x="${(x + barW / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--fg)">${count}</text>`,
+        `<text x="${(x + barW / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" font-size="14" fill="var(--fg)">${count}</text>`,
       );
     }
   }
   for (const t of niceTicks(min, max, 5)) {
     const x = box.x0 + ((t - min) / (max === min ? 1 : max - min)) * box.width;
     parts.push(
-      `<text x="${x.toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
+      `<text x="${x.toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
     );
   }
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 12}" text-anchor="middle" font-size="11" fill="var(--muted)">Δ (${escapeXml(opts.unit)})</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 12}" text-anchor="middle" font-size="14" fill="var(--muted)">Δ (${escapeXml(opts.unit)})</text>`,
   );
   parts.push(
-    `<text x="16" y="${box.y0 + box.height / 2}" text-anchor="middle" font-size="11" fill="var(--muted)" transform="rotate(-90 16 ${box.y0 + box.height / 2})">Participants</text>`,
+    `<text x="16" y="${box.y0 + box.height / 2}" text-anchor="middle" font-size="14" fill="var(--muted)" transform="rotate(-90 16 ${box.y0 + box.height / 2})">Participants</text>`,
   );
   parts.push(svgClose());
   return parts.join("");
@@ -394,17 +394,17 @@ export function renderScatter(
       `<line x1="${box.x0}" y1="${yScale(0).toFixed(1)}" x2="${box.x1}" y2="${yScale(0).toFixed(1)}" stroke="var(--muted)" stroke-dasharray="4 4" />`,
     );
     parts.push(
-      `<text x="${box.x1 - 2}" y="${(yScale(0) - 4).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">Δ = 0</text>`,
+      `<text x="${box.x1 - 2}" y="${(yScale(0) - 4).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--muted)">Δ = 0</text>`,
     );
   }
   for (const t of niceTicks(xMin, xMax, 5)) {
     parts.push(
-      `<text x="${xScale(t).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeXml(formatNumber(t))}</text>`,
+      `<text x="${xScale(t).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--muted)">${escapeXml(formatNumber(t))}</text>`,
     );
   }
   for (const t of niceTicks(yMin, yMax, 5)) {
     parts.push(
-      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${escapeXml(formatNumber(t))}</text>`,
+      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--muted)">${escapeXml(formatNumber(t))}</text>`,
     );
   }
   for (const p of points) {
@@ -418,7 +418,7 @@ export function renderScatter(
         `<g ${attrs}><polygon points="${cx},${(Number(cy) - 6).toFixed(1)} ${(Number(cx) + 6).toFixed(1)},${cy} ${cx},${(Number(cy) + 6).toFixed(1)} ${(Number(cx) - 6).toFixed(1)},${cy}" ` +
           `fill="var(--accent)" stroke="var(--fg)" stroke-width="1">` +
           `<title>${escapeXml(p.label)}: flagged outlier</title></polygon>` +
-          `<text x="${(Number(cx) + 9).toFixed(1)}" y="${(Number(cy) + 3).toFixed(1)}" font-size="10" fill="var(--fg)">${escapeXml(p.label)}</text></g>`,
+          `<text x="${(Number(cx) + 9).toFixed(1)}" y="${(Number(cy) + 3).toFixed(1)}" font-size="14" fill="var(--fg)">${escapeXml(p.label)}</text></g>`,
       );
     } else {
       parts.push(
@@ -428,10 +428,10 @@ export function renderScatter(
     }
   }
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 12}" text-anchor="middle" font-size="11" fill="var(--muted)">${escapeXml(opts.xLabel)}</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 12}" text-anchor="middle" font-size="14" fill="var(--muted)">${escapeXml(opts.xLabel)}</text>`,
   );
   parts.push(
-    `<text x="16" y="${box.y0 + box.height / 2}" text-anchor="middle" font-size="11" fill="var(--muted)" transform="rotate(-90 16 ${box.y0 + box.height / 2})">${escapeXml(opts.yLabel)}</text>`,
+    `<text x="16" y="${box.y0 + box.height / 2}" text-anchor="middle" font-size="14" fill="var(--muted)" transform="rotate(-90 16 ${box.y0 + box.height / 2})">${escapeXml(opts.yLabel)}</text>`,
   );
   parts.push(svgClose());
   return parts.join("");
@@ -502,22 +502,22 @@ export function renderCohortBars(
     );
     const labelY = g.meanDelta >= 0 ? yTop - 4 : yBot + 14;
     parts.push(
-      `<text x="${(x + barW / 2).toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--fg)">${escapeXml(formatValue(g.meanDelta, unit))}</text>`,
+      `<text x="${(x + barW / 2).toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="14" fill="var(--fg)">${escapeXml(formatValue(g.meanDelta, unit))}</text>`,
     );
     parts.push(
-      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--fg)">${escapeXml(g.name)}</text>`,
+      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--fg)">${escapeXml(g.name)}</text>`,
     );
     parts.push(
-      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 30}" text-anchor="middle" font-size="10" fill="var(--muted)">n = ${g.n}; flagged ${g.flagged}</text>`,
+      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 30}" text-anchor="middle" font-size="14" fill="var(--muted)">n = ${g.n}; flagged ${g.flagged}</text>`,
     );
   });
   for (const t of niceTicks(yMin, yMax, 5)) {
     parts.push(
-      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${escapeXml(formatValue(t, unit))}</text>`,
+      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--muted)">${escapeXml(formatValue(t, unit))}</text>`,
     );
   }
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="11" fill="var(--muted)">Mean Δ (${escapeXml(unit)}) by cohort</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="14" fill="var(--muted)">Mean Δ (${escapeXml(unit)}) by cohort</text>`,
   );
   parts.push(svgClose());
   return parts.join("");
@@ -584,7 +584,7 @@ export function renderBoundsView(
   const parts: string[] = [svgOpen({ title: opts.title, subtitle, desc, height })];
   for (const t of niceTicks(xMin, xMax, 5)) {
     parts.push(
-      `<text x="${xScale(t).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
+      `<text x="${xScale(t).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
     );
   }
   rows.forEach((r, i) => {
@@ -593,7 +593,7 @@ export function renderBoundsView(
     const xHi = xScale(r.max);
     const recordedAttr = r.recorded === null ? "missing" : String(r.recorded);
     parts.push(
-      `<text x="${box.x0 - 8}" y="${(cy + 3).toFixed(1)}" text-anchor="end" font-size="11" fill="var(--fg)">${escapeXml(r.label)}</text>`,
+      `<text x="${box.x0 - 8}" y="${(cy + 3).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--fg)">${escapeXml(r.label)}</text>`,
     );
     parts.push(
       `<g data-label="${escapeXml(r.label)}" data-min="${r.min}" data-max="${r.max}" data-recorded="${recordedAttr}">`,
@@ -615,13 +615,13 @@ export function renderBoundsView(
       );
     } else {
       parts.push(
-        `<text x="${((xLo + xHi) / 2).toFixed(1)}" y="${(cy - 10).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--muted)">recorded: missing</text>`,
+        `<text x="${((xLo + xHi) / 2).toFixed(1)}" y="${(cy - 10).toFixed(1)}" text-anchor="middle" font-size="14" fill="var(--muted)">recorded: missing</text>`,
       );
     }
     parts.push("</g>");
   });
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="11" fill="var(--muted)">Benefit (${escapeXml(opts.unit)}); bar = justified range, point = recorded PA_AMB</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="14" fill="var(--muted)">Benefit (${escapeXml(opts.unit)}); bar = justified range, point = recorded PA_AMB</text>`,
   );
   parts.push(svgClose());
   return parts.join("");
@@ -691,7 +691,7 @@ export function renderDispositionBars(
     const barW = maxN === 0 ? 0 : (o.n / maxN) * barWMax;
     const pct = total === 0 ? 0 : (o.n / total) * 100;
     parts.push(
-      `<text x="16" y="${(y + 15).toFixed(1)}" font-size="11" fill="var(--fg)">${escapeXml(dispositionLabel(o.disposition))}</text>`,
+      `<text x="16" y="${(y + 15).toFixed(1)}" font-size="14" fill="var(--fg)">${escapeXml(dispositionLabel(o.disposition))}</text>`,
     );
     parts.push(
       `<rect x="${barX0}" y="${y}" width="${Math.max(o.n > 0 ? 2 : 0, barW).toFixed(1)}" height="20" ` +
@@ -699,7 +699,7 @@ export function renderDispositionBars(
         `<title>${escapeXml(dispositionLabel(o.disposition))}: ${o.n} of ${total} participants (${formatNumber(pct)}%)</title></rect>`,
     );
     parts.push(
-      `<text x="${(barX0 + barW + 8).toFixed(1)}" y="${(y + 15).toFixed(1)}" font-size="11" fill="var(--fg)">${o.n} (${formatNumber(pct)}%)</text>`,
+      `<text x="${(barX0 + barW + 8).toFixed(1)}" y="${(y + 15).toFixed(1)}" font-size="14" fill="var(--fg)">${o.n} (${formatNumber(pct)}%)</text>`,
     );
   });
   parts.push(svgClose());
@@ -781,19 +781,19 @@ export function renderBoxplot(
     );
     parts.push("</g>");
     parts.push(
-      `<text x="${cx.toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--fg)">${escapeXml(g.name)}</text>`,
+      `<text x="${cx.toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--fg)">${escapeXml(g.name)}</text>`,
     );
     parts.push(
-      `<text x="${cx.toFixed(1)}" y="${box.y1 + 30}" text-anchor="middle" font-size="10" fill="var(--muted)">n = ${g.n}</text>`,
+      `<text x="${cx.toFixed(1)}" y="${box.y1 + 30}" text-anchor="middle" font-size="14" fill="var(--muted)">n = ${g.n}</text>`,
     );
   });
   for (const t of niceTicks(yMin, yMax, 5)) {
     parts.push(
-      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
+      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
     );
   }
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="11" fill="var(--muted)">Value (${escapeXml(opts.unit)}) by group</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="14" fill="var(--muted)">Value (${escapeXml(opts.unit)}) by group</text>`,
   );
   parts.push(svgClose());
   return parts.join("");
@@ -884,10 +884,10 @@ export function renderWaterfall(
         `<title>${escapeXml(s.label)}: ${escapeXml(formatValue(s.value, opts.unit))} (${s.kind})</title></rect>`,
     );
     parts.push(
-      `<text x="${(x + barW / 2).toFixed(1)}" y="${(yTop - 4).toFixed(1)}" text-anchor="middle" font-size="10" fill="var(--fg)">${escapeXml(formatValue(s.value, opts.unit))}</text>`,
+      `<text x="${(x + barW / 2).toFixed(1)}" y="${(yTop - 4).toFixed(1)}" text-anchor="middle" font-size="14" fill="var(--fg)">${escapeXml(formatValue(s.value, opts.unit))}</text>`,
     );
     parts.push(
-      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="10" fill="var(--fg)">${escapeXml(s.label)}</text>`,
+      `<text x="${(x + barW / 2).toFixed(1)}" y="${box.y1 + 16}" text-anchor="middle" font-size="14" fill="var(--fg)">${escapeXml(s.label)}</text>`,
     );
     if (i < steps.length - 1) {
       const nextFrom = levels[i + 1] as number;
@@ -899,11 +899,11 @@ export function renderWaterfall(
   });
   for (const t of niceTicks(yMin, yMax, 5)) {
     parts.push(
-      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="10" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
+      `<text x="${box.x0 - 6}" y="${(yScale(t) + 3).toFixed(1)}" text-anchor="end" font-size="14" fill="var(--muted)">${escapeXml(formatValue(t, opts.unit))}</text>`,
     );
   }
   parts.push(
-    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="11" fill="var(--muted)">Value (${escapeXml(opts.unit)})</text>`,
+    `<text x="${box.x0 + box.width / 2}" y="${height - 6}" text-anchor="middle" font-size="14" fill="var(--muted)">Value (${escapeXml(opts.unit)})</text>`,
   );
   parts.push(svgClose());
   return parts.join("");

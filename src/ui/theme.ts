@@ -1,17 +1,15 @@
 /**
  * Theme — Stage 6 UI core (Worker A).
  *
- * Dark by default, with a toggle (MASTER_PROMPT §18; Stage 3 P-09).
- * Tokens are the P-09 probe tokens (stage3/poc/poc-p09-dark-theme.html):
- * dark bg #000000, fg #f2f0e9, muted #b8b5ac, accent #7fb3ff,
- * header #0a1f44; light bg #ffffff, fg #1a1a1a, accent #002d72.
- *
- * GAP (flagged, not invented around): PBGC Design System v1.1.0 defines
- * no dark theme. The dark tokens below come from the P-09 probe, not
- * from the design system. Where the design system defines a token
- * (PBGC blue #002D72, Helvetica Neue/Arial), the light theme uses it.
- * If the design system later adds a dark theme, these tokens should be
- * replaced with its tokens, not kept alongside them.
+ * Dark by default, with a toggle (MASTER_PROMPT §18).
+ * Tokens are the PBGC Design System v1.1.0 DRAFT values (fetched
+ * 2026-11-12 from ErChulo/pbgc-design-system @ 84a7149d).
+ * The P-09 probe tokens (dark bg #000000, fg #f2f0e9, muted #b8b5ac,
+ * accent #7fb3ff, header #0a1f44) are SUPERSEDED by the design
+ * system's own provisional dark theme (DS v1.1.0 §2.5,
+ * OPEN-QUESTIONS Q6, not COLA-approved) and are not kept alongside.
+ * Light bg #ffffff, fg #1a1a1a, accent #002d72 are DS values.
+ * These tokens must not drift from src/ui/styles.css.
  *
  * Storage: the DEL precedent (del-generator.html `delSafeStorage`):
  * every localStorage access is inside try/catch, with a null /
@@ -29,26 +27,27 @@ export const THEME_STORAGE_KEY = "pa-amb-theme";
 /** Default theme (MASTER_PROMPT §18: true dark theme by default). */
 export const DEFAULT_THEME: ThemeName = "dark";
 
-/** P-09 dark-theme tokens. */
+/** Dark-theme tokens: DS v1.1.0 provisional dark theme (§2.5, Q6,
+ *  not COLA-approved). Header #002D72 is DS-defined, both themes. */
 export const DARK_THEME_TOKENS = {
-  bg: "#000000",
-  fg: "#f2f0e9",
-  muted: "#b8b5ac",
-  accent: "#7fb3ff",
-  rowAlt: "#141414",
-  border: "#333333",
-  headerBg: "#0a1f44",
+  bg: "#0B1B36",
+  fg: "#F2F2F2",
+  muted: "#D2D2D2",
+  accent: "#BEC6DF",
+  rowAlt: "#12294D",
+  border: "#8B9FC7",
+  headerBg: "#002D72",
 } as const;
 
-/** Light-theme tokens. Accent and header use PBGC blue #002D72. */
+/** Light-theme tokens: DS v1.1.0 §2.3. Accent and header use PBGC blue #002D72. */
 export const LIGHT_THEME_TOKENS = {
-  bg: "#ffffff",
-  fg: "#1a1a1a",
-  muted: "#555555",
-  accent: "#002d72",
-  rowAlt: "#f2f2f2",
-  border: "#cccccc",
-  headerBg: "#002d72",
+  bg: "#FFFFFF",
+  fg: "#1A1A1A",
+  muted: "#58585B",
+  accent: "#002D72",
+  rowAlt: "#F2F2F2",
+  border: "#81807F",
+  headerBg: "#002D72",
 } as const;
 
 /** Theme tokens: one colour per role, in either theme. */

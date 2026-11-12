@@ -66,7 +66,8 @@ it was not added to the repo-root `package.json`.
     refused and recorded without moving the wizard.
   - `zero-fetch`: 2 requests across load + reload, all `file://`,
     0 http/https.
-  - `theme-rows`: dark by default (bg #000000, fg #f2f0e9), toggle
+  - `theme-rows`: dark by default (DS provisional bg #0B1B36,
+    fg #F2F2F2), toggle
     to light (PBGC blue #002d72 header) and back without reload;
     1,000-row table rendered in ~37 ms (Chromium headless on this
     Linux build machine — a baseline measurement, not an office
@@ -78,13 +79,20 @@ it was not added to the repo-root `package.json`.
 
 ## Design-system dark-theme gap (flagged, not resolved)
 
-PBGC Design System v1.1.0 defines **no dark theme**. The dark
-tokens in the app (bg #000000, fg #f2f0e9, muted #b8b5ac, accent
-#7fb3ff, header #0a1f44) are the Stage 3 P-09 probe tokens, not
-system tokens. Where the system defines a token (PBGC blue #002D72,
-Helvetica Neue/Arial) the light theme uses it. If the design system
-later adds a dark theme, replace the P-09 tokens with its tokens;
-do not keep both.
+PBGC Design System v1.1.0 defines **no approved dark theme**. The
+dark tokens in the app (bg #0B1B36, fg #F2F2F2, muted #D2D2D2,
+accent #BEC6DF, header #002D72) are the design system's own
+**provisional** dark theme (DS §2.5, OPEN-QUESTIONS Q6, not
+COLA-approved), adopted 2026-11-12 per docs/DESIGN_SYSTEM_AUDIT.md.
+The Stage 3 P-09 probe tokens (bg #000000, fg #f2f0e9, muted
+#b8b5ac, accent #7fb3ff, header #0a1f44) are superseded and are not
+kept alongside. The light theme uses the DS tokens (PBGC blue
+#002D72, Helvetica Neue/Arial). The dark theme stays provisional
+until COLA answers Q6; the app must not claim design-system
+compliance for dark mode. Suggested design-system update (user
+decides; the design-system repo itself is not changed): approve a
+dark theme. The header stays text-only: no official logo asset
+exists in-repo (DS §4: reproduce, never redraw).
 
 ## 0-fetch exceptions (documented, not silent)
 

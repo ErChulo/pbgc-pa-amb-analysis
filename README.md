@@ -1,6 +1,6 @@
 # PA_AMB Analysis System
 
-[![single HTML file](https://img.shields.io/badge/single%20HTML%20file-483%20KB-blue)](pa-amb-analysis.html)
+[![single HTML file](https://img.shields.io/badge/single%20HTML%20file-492%20KB-blue)](pa-amb-analysis.html)
 [![0 fetch](https://img.shields.io/badge/network%20fetch-0-green)](stage7/VERIFICATION_REPORT.md)
 [![tests passing](https://img.shields.io/badge/tests-928%20passing-brightgreen)](stage7/VERIFICATION_REPORT.md)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-blue)](tsconfig.json)
@@ -58,7 +58,7 @@ BCV3.PA_AMB_ACCEPT (Y/N). That is the only accept flag.
 
 ## How to use it
 
-The app is one file: `pa-amb-analysis.html` (483,250 bytes). Double-click
+The app is one file: `pa-amb-analysis.html` (492,071 bytes). Double-click
 it. It opens in the browser from `file://`. There is no server, no install,
 and no network fetch. It makes zero network requests.
 
@@ -118,6 +118,29 @@ acceptance decisions and their evidence.
 ### Theme
 
 Dark by default. A toggle switches to light.
+
+### Design system
+
+The app follows the PBGC Design System v1.1.0 DRAFT, fetched
+2026-11-12 from ErChulo/pbgc-design-system @ 84a7149d. That version
+is DRAFT for COLA and Section 508 review. It is not approved. The
+full audit is docs/DESIGN_SYSTEM_AUDIT.md.
+
+- **Dark theme is provisional.** The dark colours are the design
+  system's own provisional dark theme (DS §2.5, OPEN-QUESTIONS Q6).
+  They are not COLA-approved. The app never presents them as
+  approved. Suggested design-system update: approve a dark theme.
+  The user decides. The design-system repo itself is not changed.
+- **Dark by default is a product decision, not a design-system
+  decision.** The design system does not say which theme an app
+  should default to.
+- **No logo in the header.** The design system wants the official
+  logo, white on PBGC Blue. No official logo file exists in this
+  repo, so the header stays text-only. A substitute logo is never
+  drawn.
+- **Reports use the serif long-form.** Report bodies print in
+  Garamond (DS §3, long-form), black on white, 12pt, with link
+  URLs printed.
 
 ### Tolerance
 

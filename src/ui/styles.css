@@ -1,53 +1,83 @@
 /* PA_AMB Analysis System — app styles (Stage 6, Worker A).
  *
- * Dark theme by default (MASTER_PROMPT §18; Stage 3 P-09 probe tokens).
+ * PBGC Design System v1.1.0 DRAFT (fetched 2026-11-12 from
+ * ErChulo/pbgc-design-system @ 84a7149d; repo-root design.md).
+ * Status: DRAFT for COLA and Section 508 review. NOT approved.
+ * Tokens in tokens/tokens.json are the single source of truth.
+ * Every value below cites its DS token or rule in a comment.
+ *
+ * Dark theme by default (MASTER_PROMPT §18). The dark theme is the
+ * design system's own PROVISIONAL dark theme (DS v1.1.0 §2.5,
+ * OPEN-QUESTIONS Q6, not COLA-approved) — see D1–D13 below. Never
+ * present any dark value as design-system-approved.
  * Light theme via [data-theme="light"] on <html>.
  *
- * GAP (flagged, not invented around): PBGC Design System v1.1.0 defines
- * no dark theme. Dark tokens below are the P-09 probe tokens
- * (bg #000000, fg #f2f0e9, muted #b8b5ac, accent #7fb3ff,
- * header #0a1f44). Where the design system defines a token — PBGC blue
- * #002D72, Helvetica Neue/Arial — the light theme uses it, and the dark
- * header uses the P-09 dark header #0a1f44. If the design system later
- * adds a dark theme, replace these tokens with its tokens.
+ * Suggested design-system update (recorded in README.md, user
+ * decides; the design-system repo itself is not changed): the dark
+ * theme needs COLA approval (Q6). The header stays text-only: no
+ * official logo asset exists in-repo (DS §4: reproduce, never
+ * redraw).
  *
  * No external fonts, no CDN, no fetch. Classic single-file app.
  */
 
 /* ---- Theme tokens ---- */
+/* Dark theme — PROVISIONAL. DS v1.1.0 §2.5, OPEN-QUESTIONS Q6,
+ * not COLA-approved. Every value below is a DS theme.dark value. */
 :root,
 [data-theme="dark"] {
-  --bg: #000000;
-  --fg: #f2f0e9;
-  --muted: #b8b5ac;
-  --accent: #7fb3ff;
-  --row-alt: #141414;
-  --border: #333333;
-  --header-bg: #0a1f44;
-  --header-fg: #ffffff;
-  --button-bg: #0a1f44;
-  --button-fg: #ffffff;
-  --focus: #7fb3ff;
-  --warn: #ffb86b;
-  --fail: #ff9d9d;
-  --pass: #9ed69e;
+  --bg: #0B1B36; /* D1 theme.dark.bg.page — palette.derived.night-0 — PROVISIONAL */
+  --fg: #F2F2F2; /* D2 theme.dark.text.default — palette.support.gray-4 — PROVISIONAL */
+  --muted: #D2D2D2; /* D3 theme.dark.text.muted — palette.support.gray-2 — PROVISIONAL */
+  --accent: #BEC6DF; /* D4 theme.dark.text.link — palette.support.blue-1 — PROVISIONAL */
+  --row-alt: #12294D; /* D5 theme.dark.bg.subtle — palette.derived.night-1 — PROVISIONAL */
+  --border: #8B9FC7; /* D6 theme.dark.border.input — palette.support.blue-2 — PROVISIONAL */
+  --header-bg: #002D72; /* D7 theme.dark.bg.inverse — palette.brand.blue — DS-defined, both themes */
+  --header-fg: #FFFFFF; /* theme.dark.text.inverse — DS-defined, both themes */
+  --button-bg: #BEC6DF; /* D8 theme.dark.action.primary-bg — palette.support.blue-1 — PROVISIONAL */
+  --button-fg: #002D72; /* D9 theme.dark.action.primary-fg — palette.brand.blue — PROVISIONAL */
+  --button-hover-bg: #FFFFFF; /* theme.dark.action.primary-bg-hover — PROVISIONAL */
+  --secondary-bg: #0B1B36; /* theme.dark.action.secondary-bg — PROVISIONAL */
+  --secondary-fg: #BEC6DF; /* theme.dark.action.secondary-fg — PROVISIONAL */
+  --secondary-border: #BEC6DF; /* theme.dark.action.secondary-border — PROVISIONAL */
+  --secondary-hover-bg: #12294D; /* theme.dark.action.secondary-bg-hover — PROVISIONAL */
+  --focus: #FFFFFF; /* D10 theme.dark.focus.ring — PROVISIONAL */
+  --focus-inverse: #FFFFFF; /* focus.ring-on-inverse — white on blue surfaces, both themes */
+  --warn: #FFD27A; /* D11 theme.dark.status.warning-accent — PROVISIONAL */
+  --fail: #FFB3BD; /* D12 theme.dark.status.error-accent — PROVISIONAL */
+  --pass: #B8D3A7; /* D13 theme.dark.status.success-accent — palette.support.green-2 — PROVISIONAL */
 }
 
+/* Light theme — DS v1.1.0 §2.3. */
 [data-theme="light"] {
-  --bg: #ffffff;
-  --fg: #1a1a1a;
-  --muted: #555555;
-  --accent: #002d72;
-  --row-alt: #f2f2f2;
-  --border: #cccccc;
-  --header-bg: #002d72;
-  --header-fg: #ffffff;
-  --button-bg: #002d72;
-  --button-fg: #ffffff;
-  --focus: #002d72;
-  --warn: #8a5a00;
-  --fail: #a00000;
-  --pass: #006400;
+  --bg: #FFFFFF; /* L1 theme.light.bg.page */
+  --fg: #1A1A1A; /* L2 theme.light.text.default — palette.derived.ink (derived) */
+  --muted: #58585B; /* L3 theme.light.text.muted — palette.support.gray-1 */
+  --accent: #002D72; /* L4 theme.light.text.link — palette.brand.blue */
+  --row-alt: #F2F2F2; /* L5 theme.light.bg.subtle — palette.support.gray-4 */
+  --border: #81807F; /* L6 theme.light.border.input — palette.secondary.gray */
+  --header-bg: #002D72; /* L7 theme.light.bg.inverse — palette.brand.blue */
+  --header-fg: #FFFFFF; /* L8 theme.light.text.inverse */
+  --button-bg: #002D72; /* L9 theme.light.action.primary-bg */
+  --button-fg: #FFFFFF; /* L10 theme.light.action.primary-fg */
+  --button-hover-bg: #004B8D; /* theme.light.action.primary-bg-hover — palette.secondary.medium-blue */
+  --secondary-bg: #FFFFFF; /* theme.light.action.secondary-bg */
+  --secondary-fg: #002D72; /* theme.light.action.secondary-fg */
+  --secondary-border: #002D72; /* theme.light.action.secondary-border */
+  --secondary-hover-bg: #F2F2F2; /* theme.light.action.secondary-bg-hover */
+  --focus: #004B8D; /* L11 theme.light.focus.ring — palette.secondary.medium-blue */
+  --focus-inverse: #FFFFFF; /* focus.ring-on-inverse — white on blue surfaces, both themes */
+  --warn: #8A5700; /* L12 theme.light.status.warning-accent — palette.derived.warning (derived) */
+  --fail: #B3001B; /* L13 theme.light.status.error-accent — palette.derived.error (derived) */
+  --pass: #008065; /* L14 theme.light.status.success-accent — palette.secondary.medium-green */
+}
+
+/* Motion tokens (DS §6): 150ms state, 250ms elevation. The app has
+ * no transitions today; these exist so any future transition uses
+ * them. Under prefers-reduced-motion they become 0.01ms (see below). */
+:root {
+  --transition-state: 150ms;
+  --transition-elevation: 250ms;
 }
 
 /* ---- Base ---- */
@@ -63,34 +93,61 @@ html {
 body {
   background: var(--bg);
   color: var(--fg);
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  font-size: 14px;
-  line-height: 1.45;
+  font-family: "Helvetica Neue", Arial, sans-serif; /* T1 static.font.sans */
+  font-size: 16px; /* T2 static.font.size-base: 1rem */
+  line-height: 1.5; /* T3 static.font.leading-body */
   margin: 0;
   padding: 0;
 }
 
 h1, h2, h3 {
-  line-height: 1.25;
+  font-weight: 700; /* static.font.weight-bold */
+  line-height: 1.25; /* static.font.leading-tight */
   margin: 0 0 8px 0;
 }
 
-h1 { font-size: 20px; }
-h2 { font-size: 16px; }
-h3 { font-size: 14px; }
+h1 { font-size: 36px; } /* T4 static.font.size-h1: 2.25rem */
+h2 { font-size: 28px; } /* T5 static.font.size-h2: 1.75rem */
+h3 { font-size: 22px; } /* T6 static.font.size-h3: 1.375rem */
 
 p { margin: 0 0 8px 0; }
 
-a { color: var(--accent); }
+/* Prose measure (G16): line length capped at 60 characters. */
+main p {
+  max-width: 60ch; /* --pbgc-measure-prose: 60ch (§3) */
+}
+
+a {
+  color: var(--accent);
+  text-decoration: underline; /* T15 §2.4: links are always underlined */
+}
 
 .muted { color: var(--muted); }
 .accent { color: var(--accent); }
 
+/* Skip link (G10, DS §7 HeaderNav contract: "Skip link first").
+ * Hidden until focused, then visible. */
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -64px;
+  background: var(--header-bg);
+  color: var(--header-fg);
+  padding: 8px 16px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
 /* ---- Header ---- */
+/* Text-only header (G9): no official logo asset exists in-repo, so
+ * no logo is drawn (DS §4: reproduce, never redraw). */
 #app-header {
   background: var(--header-bg);
   color: var(--header-fg);
-  padding: 10px 16px;
+  padding: 8px 16px;
 }
 
 #app-header h1 {
@@ -100,7 +157,7 @@ a { color: var(--accent); }
 #app-header .subtitle {
   color: var(--header-fg);
   opacity: 0.85;
-  margin: 2px 0 0 0;
+  margin: 8px 0 0 0;
 }
 
 #app-header .header-actions {
@@ -108,11 +165,15 @@ a { color: var(--accent); }
 }
 
 /* ---- Compact navigation ---- */
+#wizard-nav-toggle {
+  display: none;
+}
+
 #wizard-nav,
 #app-nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--border);
   background: var(--bg);
@@ -129,33 +190,60 @@ nav button[aria-current="step"] {
   font-weight: bold;
 }
 
+/* Nav disclosure below 1024px (T18, §5 breakpoints: desktop starts
+ * at 1024px). The toggle button is wired in main.ts bootApp. */
+@media (max-width: 1023px) {
+  #wizard-nav-toggle {
+    display: block;
+    margin: 8px 16px 0 16px;
+  }
+
+  #wizard-nav {
+    display: none;
+  }
+
+  #wizard-nav[data-open="true"] {
+    display: flex;
+  }
+}
+
 /* ---- Buttons ---- */
 button {
   background: var(--button-bg);
   color: var(--button-fg);
   border: 1px solid var(--border);
-  border-radius: 3px;
-  padding: 6px 12px;
+  border-radius: 4px; /* T10 static.radius.default */
+  padding: 8px 16px;
+  min-height: 44px; /* T9 static.target.min: no "small" button */
   font-family: inherit;
-  font-size: 13px;
+  font-size: 16px; /* T8 static.font.size-base */
   cursor: pointer;
 }
 
 button:hover:not(:disabled) {
-  filter: brightness(1.15);
+  background: var(--button-hover-bg); /* T11 theme.action.primary-bg-hover; no brightness filter */
 }
 
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  /* T13: disabled is not conveyed by opacity alone. The app also
+   * adds a visible "(unavailable)" label to disabled buttons
+   * (main.ts renderApp, onboarding.ts tour Back button). */
 }
 
 button.secondary {
-  background: transparent;
-  color: var(--fg);
+  background: var(--secondary-bg); /* T12 theme.action.secondary-* */
+  color: var(--secondary-fg);
+  border-color: var(--secondary-border);
 }
 
-/* Visible focus for keyboard and screen-reader users. */
+button.secondary:hover:not(:disabled) {
+  background: var(--secondary-hover-bg);
+}
+
+/* Visible focus for keyboard and screen-reader users. Geometry is
+ * the DS focus contract (T14: 3px ring, 2px offset, §9.2). */
 button:focus-visible,
 a:focus-visible,
 [tabindex]:focus-visible {
@@ -163,15 +251,23 @@ a:focus-visible,
   outline-offset: 2px;
 }
 
+/* Focus on blue surfaces (header, primary buttons): white ring in
+ * both themes (focus.ring-on-inverse #FFFFFF). This fixes the old
+ * 1.00:1 failure: a #002D72 ring on a #002D72 surface was invisible. */
+#app-header :focus-visible,
+button:not(.secondary):focus-visible {
+  outline-color: var(--focus-inverse);
+}
+
 /* ---- Layout ---- */
 #pa-amb-app {
-  max-width: 1100px;
+  max-width: 1400px; /* T16 static.container.max */
   margin: 0 auto;
   padding: 0 0 32px 0;
 }
 
 main {
-  padding: 12px 16px;
+  padding: 16px;
 }
 
 section {
@@ -180,29 +276,36 @@ section {
 
 #status-line {
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px; /* T7 static.font.size-small: 0.875rem */
   padding: 8px 16px;
   border-bottom: 1px solid var(--border);
 }
 
 #help-panel {
   border: 1px solid var(--border);
-  padding: 12px 16px;
-  margin: 12px 16px;
+  padding: 16px;
+  margin: 16px;
 }
 
 /* ---- Tables ---- */
 table {
   border-collapse: collapse;
   width: 100%;
-  font-size: 13px;
+  font-size: 14px; /* T7 static.font.size-small */
+  font-variant-numeric: tabular-nums; /* T19 §3: tabular figures */
 }
 
 th, td {
   border: 1px solid var(--border);
-  padding: 4px 8px;
+  padding: 8px;
   text-align: left;
   vertical-align: top;
+}
+
+/* T19: numbers in tables right-align. */
+td.numeric,
+th.numeric {
+  text-align: right;
 }
 
 th {
@@ -214,38 +317,51 @@ tbody tr:nth-child(even) td {
   background: var(--row-alt);
 }
 
+/* Focusable labelled scroll region for wide tables (G11, T18):
+ * tables scroll inside this region at 320px / 400% zoom instead
+ * of forcing page-level horizontal scrolling. */
+.table-scroll {
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+
+.table-scroll:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
 /* ---- Wizard steps ---- */
 [data-step-panel] {
   border: 1px solid var(--border);
-  padding: 12px;
-  margin-bottom: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
 }
 
 #advanced-view section {
   border: 1px solid var(--border);
-  padding: 12px;
+  padding: 16px;
 }
 
 /* ---- Input-shape guide (Import step) ---- */
 .input-guide {
   border: 1px solid var(--border);
-  padding: 10px 12px;
+  padding: 8px 16px;
   margin: 0 0 8px 0;
 }
 
 .input-guide h3 {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .input-guide h4 {
-  margin: 10px 0 4px 0;
+  margin: 16px 0 8px 0;
 }
 
 .input-guide dl {
   display: grid;
   grid-template-columns: max-content 1fr;
-  column-gap: 12px;
-  row-gap: 2px;
+  column-gap: 16px;
+  row-gap: 8px;
   margin: 0 0 8px 0;
 }
 
@@ -259,20 +375,41 @@ tbody tr:nth-child(even) td {
 
 .input-guide ul {
   margin: 0 0 8px 0;
-  padding-left: 18px;
+  padding-left: 24px;
 }
 
 .input-guide li {
-  margin-bottom: 2px;
+  margin-bottom: 8px;
 }
 
 .input-guide code {
   font-family: inherit;
 }
 
+/* ---- Onboarding (T26) ---- */
+/* The tour overlay, help centre, and context help used to carry
+ * hard-coded inline dark styles (#000000 / #f2f0e9). They now use
+ * these classes, driven by the theme tokens, so the theme toggle
+ * reaches them. Dark values are the DS provisional dark theme. */
+.onboarding-overlay {
+  background: var(--bg);
+  color: var(--fg);
+}
+
+.onboarding-panel {
+  background: var(--bg);
+  color: var(--fg);
+  padding: 16px;
+}
+
+.onboarding-text {
+  background: var(--bg);
+  color: var(--fg);
+}
+
 /* ---- Invariants, dispositions, charts, reports ---- */
 #invariant-list li {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 #disposition-summary {
@@ -288,11 +425,23 @@ tbody tr:nth-child(even) td {
 
 #report-area {
   border-top: 1px solid var(--border);
-  padding-top: 12px;
+  padding-top: 16px;
 }
 
 #report-area h1, #report-area h2 {
   color: var(--fg);
+}
+
+/* ---- Motion (G14, DS §6) ---- */
+/* No animation exists today; this is additive. Under
+ * prefers-reduced-motion, durations become 0.01ms at token level. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
 }
 
 /* ---- Print (reports) ---- */
@@ -304,9 +453,11 @@ tbody tr:nth-child(even) td {
 
   #app-header,
   #wizard-nav,
+  #wizard-nav-toggle,
   #app-nav,
   #status-line,
   .header-actions,
+  .skip-link,
   button {
     display: none !important;
   }

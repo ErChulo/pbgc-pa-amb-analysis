@@ -285,12 +285,18 @@ function para(value: string | null | undefined): string {
   return `<p>${esc(v)}</p>`;
 }
 
-/** Key/value table. */
-function kvTable(rows: ReadonlyArray<readonly [string, string]>): string {
+/** Key/value table (DS DataTable, §7): a <caption> naming the table,
+ *  row headers with scope="row", inside a focusable labelled scroll
+ *  region so a wide table scrolls in its own region at 320px / 400%
+ *  zoom instead of forcing page-level horizontal scrolling. No
+ *  aria-sort: no column in a key/value table sorts (recorded as N/A). */
+function kvTable(rows: ReadonlyArray<readonly [string, string]>, caption?: string): string {
   const body = rows
     .map(([k, v]) => `<tr><th scope="row">${esc(k)}</th><td>${esc(v)}</td></tr>`)
     .join("");
-  return `<table><tbody>${body}</tbody></table>`;
+  const label = caption ?? "Table";
+  const cap = caption === undefined ? "" : `<caption>${esc(caption)}</caption>`;
+  return `<div class="table-scroll" tabindex="0" role="region" aria-label="${esc(label)}" style="overflow-x:auto"><table>${cap}<tbody>${body}</tbody></table></div>`;
 }
 
 /** Simple list, or "None recorded." when empty. */
@@ -310,14 +316,20 @@ function reproFooter(repro: ReproducibilityInfo | null | undefined): string {
     ["Tolerance version", r.toleranceVersion === null || r.toleranceVersion === undefined ? "Not supplied" : String(r.toleranceVersion)],
     ["Engine version", text(r.engineVersion)],
     ["Contribution protocol version", CONTRIBUTION_PROTOCOL_VERSION],
-  ])}<p>Rebuild from the same input snapshot and rule versions gives the same report.</p></footer>`;
+  ], "Reproducibility")}<p>Rebuild from the same input snapshot and rule versions gives the same report.</p></footer>`;
 }
 
+// PRINT_CSS — DS v1.1.0 §3 serif long-form (Garamond) for reports
+// (decision D-B) and §11 print: black on white, 12pt body. Table
+// text is 14px, the DS floor (§3: nothing below 14px carries
+// content). Links print their URLs (T24). th background is white
+// (T25, §11 black on white).
 const PRINT_CSS = [
-  "body{font-family:Arial,Helvetica,sans-serif;color:#000;background:#fff;margin:24px;line-height:1.4;}",
-  "h1{font-size:20px;}h2{font-size:15px;margin-top:20px;border-bottom:1px solid #000;}",
-  "table{border-collapse:collapse;width:100%;margin:8px 0;}th,td{border:1px solid #666;padding:4px 6px;text-align:left;vertical-align:top;font-size:13px;}",
-  "th{background:#eee;}footer{margin-top:24px;border-top:1px solid #000;}",
+  "body{font-family:Garamond,'Times New Roman',serif;color:#000;background:#fff;margin:24px;line-height:1.5;font-size:12pt;}",
+  "h1{font-size:20pt;}h2{font-size:15pt;margin-top:20px;border-bottom:1px solid #000;}",
+  "table{border-collapse:collapse;width:100%;margin:8px 0;}th,td{border:1px solid #666;padding:8px;text-align:left;vertical-align:top;font-size:14px;font-variant-numeric:tabular-nums;}",
+  "td.numeric,th.numeric{text-align:right;}th{background:#fff;}footer{margin-top:24px;border-top:1px solid #000;}",
+  "a[href]::after{content:\" (\" attr(href) \")\";}",
   "@media print{body{margin:0;}section{page-break-inside:avoid;}}",
 ].join("\n");
 
@@ -469,17 +481,17 @@ export function renderPlanReport(input: PlanReportInput): string {
         ["Plan number", text(pkg?.planNumber)],
         ["Participants", population === null ? "Not supplied" : `${population} participants`],
         ["Completeness grade", text(pkg?.completenessGrade)],
-      ]),
+      ], "Population and data completeness"),
     ),
     section("Formula and provision complexity", para(null)),
     section("Historical administrative data quality", para(null)),
     section(
       "Validation findings",
-      (validationRows.length === 0 ? "<p>Not supplied.</p>" : kvTable(validationRows)) +
+      (validationRows.length === 0 ? "<p>Not supplied.</p>" : kvTable(validationRows, "Validation findings")) +
         validationFindingList +
         itemList(val?.notes ?? null),
     ),
-    section("Reconciliation statistics", reconRows.length === 0 ? "<p>Not supplied.</p>" : kvTable(reconRows)),
+    section("Reconciliation statistics", reconRows.length === 0 ? "<p>Not supplied.</p>" : kvTable(reconRows, "Reconciliation statistics")),
     section(
       "Material discrepancy counts",
       `<p>Material differences: ${rec === null || rec.materialDifferences === null || rec.materialDifferences === undefined ? "Not supplied" : countWithDenominator(rec.materialDifferences, rec.participantsCompared ?? null, "participants")}.</p>` +
@@ -535,6 +547,7 @@ export function renderParticipantReport(input: ParticipantReportInput): string {
                 `${text(row.value)} (source: ${text(row.source)})`,
               ] as const,
           ),
+          "Relevant input data and sources",
         );
 
   const provisionList =
@@ -551,12 +564,12 @@ export function renderParticipantReport(input: ParticipantReportInput): string {
   const traceList =
     input.calculationTrace === null || input.calculationTrace === undefined || input.calculationTrace.length === 0
       ? "<p>None recorded.</p>"
-      : `<table><thead><tr><th>Step</th><th>Name</th><th>Output</th><th>Rule</th><th>Evidence grade</th><th>Assumption</th></tr></thead><tbody>${input.calculationTrace
+      : `<div class="table-scroll" tabindex="0" role="region" aria-label="Calculation trace" style="overflow-x:auto"><table><caption>Calculation trace</caption><thead><tr><th scope="col">Step</th><th scope="col">Name</th><th scope="col">Output</th><th scope="col">Rule</th><th scope="col">Evidence grade</th><th scope="col">Assumption</th></tr></thead><tbody>${input.calculationTrace
           .map(
             (s) =>
-              `<tr><td>${esc(text(s.step))}</td><td>${esc(text(s.name))}</td><td>${esc(text(s.output))}</td><td>${esc(text(s.ruleRef))}</td><td>${esc(text(s.evidenceGrade))}</td><td>${esc(text(s.assumption))}</td></tr>`,
+              `<tr><td class="numeric">${esc(text(s.step))}</td><td>${esc(text(s.name))}</td><td>${esc(text(s.output))}</td><td>${esc(text(s.ruleRef))}</td><td>${esc(text(s.evidenceGrade))}</td><td>${esc(text(s.assumption))}</td></tr>`,
           )
-          .join("")}</tbody></table>`;
+          .join("")}</tbody></table></div>`;
 
   const eventList =
     input.events === null || input.events === undefined || input.events.length === 0
@@ -613,7 +626,7 @@ export function renderParticipantReport(input: ParticipantReportInput): string {
         ["Vesting treatment", text(rb?.vestingTreatment)],
         ["Source", text(rb?.source)],
         ["Recorded date", text(rb?.recordedDate)],
-      ]),
+      ], "Recorded benefit and its documented basis"),
     ),
     section("Independent calculation trace", traceList),
     section("Historical events affecting the benefit", eventList),
@@ -627,7 +640,7 @@ export function renderParticipantReport(input: ParticipantReportInput): string {
         ["Status", text(cmp?.status)],
         ["Within tolerance", cmp?.withinTolerance === null || cmp?.withinTolerance === undefined ? "Not supplied" : cmp.withinTolerance ? "Yes" : "No"],
         ["Tolerance applied", text(cmp?.tolerance)],
-      ]),
+      ], "Numerical comparison"),
     ),
     section("Diagnostic hypotheses", hypothesisList),
     section("Missing information", missingList),
@@ -640,7 +653,7 @@ export function renderParticipantReport(input: ParticipantReportInput): string {
         ["Determination date", text(det?.determinationDate)],
         ["PA_AMB_ACCEPT", text(det?.paAmbAccept)],
         ["Corrected benefit", formatMoneyMinor(det?.correctedBenefitMinor) + " USD/month"],
-      ]),
+      ], "Recommended actuarial determination"),
     ),
     section(
       "Supporting evidence and reviewer annotations",
@@ -731,7 +744,7 @@ export function renderAmbMemo(input: AmbMemoInput): string {
     section(
       "AMB acceptance — data issues summary (R1 Section 3)",
       `<p>Concise summary only. The complete AMB memo, tested workbook, and appendix are referenced below; the full AMB analysis is not reproduced here.</p>` +
-        kvTable(rows),
+        kvTable(rows, "AMB acceptance — data issues summary"),
     ),
     section(
       "References",
@@ -739,7 +752,7 @@ export function renderAmbMemo(input: AmbMemoInput): string {
         ["Complete AMB memo", memoCitation],
         ["Tested workbook", workbookCitation],
         ["Appendix", appendixCitation ?? "Not supplied."],
-      ]) + itemList(missingRefs.length === 0 ? null : missingRefs, "No missing references."),
+      ], "References") + itemList(missingRefs.length === 0 ? null : missingRefs, "No missing references."),
     ),
     section(
       "Contribution package",
@@ -755,7 +768,7 @@ export function renderAmbMemo(input: AmbMemoInput): string {
         ["Fragments in package", `${pkg.fragments.length} (count only)`],
         ["Blocking warnings", `${blockingIssues}`],
         ["Required follow-ups", pkg.requiredFollowups.length === 0 ? "None recorded." : pkg.requiredFollowups.join("; ")],
-      ]),
+      ], "Contribution package"),
     ),
     reproFooter({
       inputSnapshotHash: input.reproducibility?.inputSnapshotHash ?? pkg.sourceSnapshotId,

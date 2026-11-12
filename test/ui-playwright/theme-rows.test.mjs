@@ -1,7 +1,9 @@
 // Stage 6 — dark theme + 1,000-row render (Worker E).
 //
-// Dark theme renders by default (bg #000000, fg #f2f0e9 — the P-09
-// probe tokens, not design-system tokens; see docs/STAGE6_BUILD.md).
+// Dark theme renders by default with the PBGC Design System v1.1.0
+// PROVISIONAL dark theme (bg #0B1B36, fg #F2F2F2 — DS §2.5,
+// OPEN-QUESTIONS Q6, not COLA-approved; see docs/STAGE6_BUILD.md).
+// The P-09 probe tokens are superseded, not kept alongside.
 // The toggle switches to light (PBGC blue #002d72 header) and back
 // without a reload. A 1,000-row table renders in-page; the render
 // time in ms is recorded, not asserted against an unmeasured
@@ -28,8 +30,8 @@ async function main() {
     // Dark by default.
     let t = await theme();
     check(t.dataTheme === "dark", `default theme should be dark, got ${t.dataTheme}`);
-    check(t.bodyBg === "rgb(0, 0, 0)", `dark body bg should be rgb(0, 0, 0), got ${t.bodyBg}`);
-    check(t.bodyFg === "rgb(242, 240, 233)", `dark body fg should be rgb(242, 240, 233), got ${t.bodyFg}`);
+    check(t.bodyBg === "rgb(11, 27, 54)", `dark body bg should be rgb(11, 27, 54), got ${t.bodyBg}`);
+    check(t.bodyFg === "rgb(242, 242, 242)", `dark body fg should be rgb(242, 242, 242), got ${t.bodyFg}`);
     check(t.toggleLabel === "Switch to light theme", `dark toggle label should offer light, got ${t.toggleLabel}`);
 
     // Toggle to light: PBGC blue header, white page. No reload.
@@ -44,7 +46,7 @@ async function main() {
     await page.locator("#theme-toggle").click();
     t = await theme();
     check(t.dataTheme === "dark", `theme after second toggle should be dark, got ${t.dataTheme}`);
-    check(t.bodyBg === "rgb(0, 0, 0)", `dark body bg should be back to rgb(0, 0, 0), got ${t.bodyBg}`);
+    check(t.bodyBg === "rgb(11, 27, 54)", `dark body bg should be back to rgb(11, 27, 54), got ${t.bodyBg}`);
 
     // 1,000-row table render probe (synthetic rows, built in-page).
     const probe = await page.evaluate(() => {
@@ -66,11 +68,11 @@ async function main() {
     });
     check(probe.rows === 1000, `expected 1000 rendered rows, got ${probe.rows}`);
     check(
-      probe.evenBg === "rgb(20, 20, 20)",
-      `even row should use the dark row-alt token rgb(20, 20, 20), got ${probe.evenBg}`,
+      probe.evenBg === "rgb(18, 41, 77)",
+      `even row should use the dark row-alt token rgb(18, 41, 77), got ${probe.evenBg}`,
     );
     console.log(
-      `PASS theme-rows: dark default (bg #000000, fg #f2f0e9), light toggle (header #002d72), back to dark without reload; 1,000-row table rendered in ${probe.ms.toFixed(1)} ms.`,
+      `PASS theme-rows: dark default (DS provisional bg #0B1B36, fg #F2F2F2), light toggle (header #002d72), back to dark without reload; 1,000-row table rendered in ${probe.ms.toFixed(1)} ms.`,
     );
   } finally {
     await browser.close();

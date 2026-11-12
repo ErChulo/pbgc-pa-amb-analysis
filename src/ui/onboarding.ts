@@ -6,8 +6,11 @@
  * `document` exists, so this module is safe to import in Node.
  *
  * Short plain sentences. One idea at a time. (STE 100.)
- * Dark theme by default: black page, soft off-white text,
- * PBGC blue #002D72 header, light blue accent #7fb3ff.
+ * Dark theme by default. Colours come from the theme tokens
+ * (PBGC Design System v1.1.0: dark provisional §2.5, light §2.3),
+ * via the .onboarding-overlay / .onboarding-panel /
+ * .onboarding-text classes in styles.css — no hard-coded colours
+ * here, so the theme toggle reaches the tour and the help.
  * All help is skippable, re-openable, and never trapping.
  */
 
@@ -104,9 +107,10 @@ export function runOnboarding(opts: {
   const overlay = document.createElement("div");
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-label", "Welcome tour");
+  overlay.setAttribute("class", "onboarding-overlay");
   overlay.setAttribute(
     "style",
-    "position:fixed;inset:0;background:#000000;color:#f2f0e9;font-family:Arial,Helvetica,sans-serif;z-index:1000;padding:24px;",
+    "position:fixed;inset:0;z-index:1000;padding:24px;",
   );
 
   const close = (skipped: boolean): void => {
@@ -136,7 +140,9 @@ export function runOnboarding(opts: {
     const body = document.createElement("p");
     body.textContent = step.text;
     const back = document.createElement("button");
-    back.textContent = "Back";
+    // T13: a disabled button is not conveyed by opacity alone.
+    // At step 1 there is no earlier step, so the label says so.
+    back.textContent = index === 0 ? "Back (unavailable)" : "Back";
     back.setAttribute("aria-label", "Go to the previous tour step");
     back.disabled = index === 0;
     back.addEventListener("click", () => {
@@ -179,7 +185,7 @@ export function renderHelpCentre(): string {
     (s) => `<li><strong>${s.title}.</strong> ${s.text}</li>`,
   ).join("");
   return [
-    '<section aria-label="Help centre" style="background:#000000;color:#f2f0e9;font-family:Arial,Helvetica,sans-serif;padding:16px;">',
+    '<section aria-label="Help centre" class="onboarding-panel">',
     "<h2>Help centre</h2>",
     "<p>This app helps a case actuary check the prior administrator's accrued monthly benefit. It works offline. Nothing is uploaded.</p>",
     "<h3>Workflow</h3>",
@@ -213,5 +219,5 @@ export function renderHelpCentre(): string {
 export function renderContextHelp(topic: string): string {
   const text = CONTEXT_HELP[topic];
   const body = text === undefined ? GENERIC_HELP : text;
-  return `<p style="background:#000000;color:#f2f0e9;font-family:Arial,Helvetica,sans-serif;">${body}</p>`;
+  return `<p class="onboarding-text">${body}</p>`;
 }

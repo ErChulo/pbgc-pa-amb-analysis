@@ -1945,6 +1945,15 @@ export function renderApp(root: HTMLElement, state: UiState): void {
     button.setAttribute("aria-current", state.wizard.currentStep === stepId ? "step" : "false");
     button.setAttribute("aria-disabled", lock.locked ? "true" : "false");
     button.title = lock.locked ? (lock.reason ?? "Locked") : wizardStepLabel(stepId);
+    // T13: disabled is not conveyed by opacity alone. The lock
+    // reason is the title; the visible label also says unavailable.
+    // The base label is stored once so re-renders stay idempotent.
+    if (button.dataset.baseLabel === undefined) {
+      button.dataset.baseLabel = button.textContent ?? "";
+    }
+    button.textContent = lock.locked
+      ? `${button.dataset.baseLabel} (unavailable)`
+      : (button.dataset.baseLabel ?? "");
   });
 
   // Step panels: wizard mode shows the current step only.
@@ -1963,6 +1972,13 @@ export function renderApp(root: HTMLElement, state: UiState): void {
     if (button instanceof HTMLButtonElement) button.disabled = lock.locked;
     button.setAttribute("aria-disabled", lock.locked ? "true" : "false");
     button.title = lock.locked ? (lock.reason ?? "Locked") : `Run ${wizardStepLabel(stepId)} on the loaded demo case`;
+    // T13: see the wizard nav buttons above.
+    if (button.dataset.baseLabel === undefined) {
+      button.dataset.baseLabel = button.textContent ?? "";
+    }
+    button.textContent = lock.locked
+      ? `${button.dataset.baseLabel} (unavailable)`
+      : (button.dataset.baseLabel ?? "");
   });
   const wizardView = elementById(root, "wizard-view");
   if (wizardView !== null) wizardView.hidden = state.wizard.mode !== "wizard";
@@ -2125,6 +2141,17 @@ export function bootApp(options?: BootOptions): AppHandle | null {
       actor,
       occurredAt: calculationTimestamp(state),
     });
+  });
+  // Wizard nav disclosure below 1024px (T18, DS §5 breakpoints):
+  // the toggle shows/hides the step nav; on desktop the nav is
+  // always visible (styles.css) and the toggle is hidden.
+  listen(elementById(root, "wizard-nav-toggle"), "click", () => {
+    const nav = elementById(root, "wizard-nav");
+    const toggle = elementById(root, "wizard-nav-toggle");
+    if (nav === null || toggle === null) return;
+    const open = nav.getAttribute("data-open") === "true";
+    nav.setAttribute("data-open", open ? "false" : "true");
+    toggle.setAttribute("aria-expanded", open ? "false" : "true");
   });
   listen(elementById(root, "view-mode-toggle"), "click", () => {
     handle.dispatch({
