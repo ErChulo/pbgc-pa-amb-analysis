@@ -1,0 +1,169 @@
+{
+  "import": {
+    "participantCount": 6,
+    "via": "real #demo-button click (nowIso)"
+  },
+  "validate": {
+    "participantResults": 6,
+    "rulesEvaluated": 405,
+    "findings": 145
+  },
+  "calculate": {
+    "SYN-001": {
+      "kind": "exact",
+      "minor": 150000,
+      "bounds": null,
+      "reason": null
+    },
+    "SYN-002": {
+      "kind": "bounds",
+      "minor": null,
+      "bounds": {
+        "min": 158400,
+        "max": 168300,
+        "recordedPosition": "inside"
+      },
+      "reason": null
+    },
+    "SYN-003": {
+      "kind": "exact",
+      "minor": 150000,
+      "bounds": null,
+      "reason": null
+    },
+    "SYN-004": {
+      "kind": "bounds",
+      "minor": null,
+      "bounds": {
+        "min": 90000,
+        "max": 96000,
+        "recordedPosition": "inside"
+      },
+      "reason": null
+    },
+    "SYN-V-01": {
+      "kind": "exact",
+      "minor": 84950,
+      "bounds": null,
+      "reason": null
+    },
+    "SYN-I-01": {
+      "kind": "indeterminate",
+      "minor": null,
+      "bounds": null,
+      "reason": "unresolved-comparison-basis"
+    }
+  },
+  "reconcile": {
+    "SYN-001": {
+      "comparable": true,
+      "delta": 0,
+      "toleranceVerdict": "within-tolerance",
+      "recommended": "verified"
+    },
+    "SYN-002": {
+      "comparable": false,
+      "delta": null,
+      "toleranceVerdict": "not-applicable",
+      "recommended": "requires-investigation"
+    },
+    "SYN-003": {
+      "comparable": true,
+      "delta": 100000,
+      "toleranceVerdict": "outside-tolerance",
+      "recommended": "requires-investigation"
+    },
+    "SYN-004": {
+      "comparable": false,
+      "delta": null,
+      "toleranceVerdict": "not-applicable",
+      "recommended": "requires-investigation"
+    },
+    "SYN-V-01": {
+      "comparable": true,
+      "delta": 50,
+      "toleranceVerdict": "within-tolerance",
+      "recommended": "verified"
+    },
+    "SYN-I-01": {
+      "comparable": false,
+      "delta": null,
+      "toleranceVerdict": "not-applicable",
+      "recommended": "indeterminate"
+    }
+  },
+  "statistics": {
+    "populationN": 6,
+    "excluded": 3,
+    "flags": [
+      {
+        "key": "SYN-003",
+        "method": "modified-z",
+        "score": 1348.3255
+      },
+      {
+        "key": "SYN-001",
+        "method": "percentile",
+        "score": 0
+      },
+      {
+        "key": "SYN-003",
+        "method": "percentile",
+        "score": 100000
+      }
+    ],
+    "explainedByGroup": 0
+  },
+  "decide": {
+    "SYN-001": {
+      "recommended": "verified",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    },
+    "SYN-002": {
+      "recommended": "requires-investigation",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    },
+    "SYN-003": {
+      "recommended": "requires-investigation",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    },
+    "SYN-004": {
+      "recommended": "requires-investigation",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    },
+    "SYN-V-01": {
+      "recommended": "verified",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    },
+    "SYN-I-01": {
+      "recommended": "indeterminate",
+      "status": "recommended",
+      "refusal": null,
+      "wasNull": true
+    }
+  },
+  "approve": {
+    "status": "approved",
+    "disposition": "verified",
+    "refusal": null
+  },
+  "publish": {
+    "findings": 1,
+    "fragments": 0,
+    "protocol": "0.1.0"
+  },
+  "goto-export": {
+    "currentStep": "export",
+    "via": "real nav click (nowIso)"
+  }
+}
