@@ -15,6 +15,8 @@ const SUITES = [
   "zero-fetch.test.mjs",
   "theme-rows.test.mjs",
   "defensive-loading.test.mjs",
+  "xlsx-import.test.mjs",
+  "csv-import.test.mjs",
 ];
 
 let failures = 0;

@@ -327,13 +327,16 @@ export function loadDemoCase(state: UiState, actor: string, occurredAt: string):
 }
 
 // ---------------------------------------------------------------------------
-// File import — Stage 7 Robustness D3 (MASTER_PROMPT §6)
+// File import — Stage 7 Robustness D3 (MASTER_PROMPT §6), Stage 8 XLSX.
 //
-// CSV and structured JSON, via the file picker (FileReader in bootApp
-// hands the text here). Malformed files are refused with a plain reason
-// and change nothing; bad cells are quarantined by S-07/S-08, never
-// guessed. XLSX/XLSM is refused with the exact gap (no DEFLATE reader
-// in the app) — see src/ui/import.ts.
+// CSV and structured JSON arrive as text (FileReader readAsText in
+// bootApp); XLSX/XLSM arrive as bytes (readAsArrayBuffer, then
+// parseXlsx from src/ui/xlsxReader.ts — cached values only, never
+// macros, never formulas). Every row path shares one helper
+// (importMappedRows): the same dopt rule, the same case-number
+// fallback, the same report shape, the same quarantine rules.
+// Malformed files are refused with a plain reason and change
+// nothing; bad cells are quarantined by S-07/S-08, never guessed.
 // ---------------------------------------------------------------------------
 
 import {
@@ -343,7 +346,119 @@ import {
   rowsToCasePackage,
   unknownColumns,
 } from "./import";
-import type { ImportReport } from "./import";
+import type { ImportedRow, ImportReport } from "./import";
+import { parseXlsx } from "./xlsxReader";
+import type { XlsxParseResult } from "./xlsxReader";
+
+/** Shared row → package → state step for CSV, JSON rows, and XLSX.
+// DOPT is required (no date is guessed); the case number comes from
+// a caseNumber cell when one is present, else from the file name.
+// `extra` carries the XLSX sheet name(s), reader warnings, and the
+// file hash; CSV passes reader warnings; JSON passes none of those. */
+function importMappedRows(
+  state: UiState,
+  fileName: string,
+  mapped: readonly ImportedRow[],
+  headers: readonly string[],
+  rowCount: number,
+  sourceFileHash: string,
+  actor: string,
+  occurredAt: string,
+  extra?: {
+    warnings?: readonly string[];
+    sheetName?: string | null;
+    sheetNames?: readonly string[];
+  },
+): { state: UiState; report: ImportReport | null; error: string | null } {
+  const dopt = mapped.map((r) => r.dopt).find((d) => d !== null) ?? null;
+  if (dopt === null) {
+    return {
+      state,
+      report: null,
+      error:
+        "Import refused: no dopt value found in the rows. DOPT is a case fact the validation needs, and no date is guessed for it — add a dopt column (YYYY-MM-DD, same on every row).",
+    };
+  }
+  const caseNumber =
+    mapped.map((r) => r.raw["caseNumber"]).find((c) => c !== undefined && c.trim() !== "") ??
+    fileName.replace(/\.[^.]*$/, "");
+  const importedDate = occurredAt.slice(0, 10);
+  const { package: pkg, report } = rowsToCasePackage(mapped, {
+    caseNumber: (caseNumber as string).trim(),
+    planName: "Imported plan — name not supplied in file",
+    planNumber: "not supplied",
+    dopt,
+    importId: `${fileName.replace(/[^A-Za-z0-9._-]/g, "_")}-${rowCount}`,
+    importedDate,
+    importedBy: actor,
+    sourceFileName: fileName,
+    sourceFileHash,
+  }, unknownColumns(headers), extra);
+  const next = applyEvent(state, {
+    kind: "import-case-package",
+    casePackage: pkg,
+    actor,
+    occurredAt,
+  });
+  return { state: next, report, error: null };
+}
+
+/** Parse XLSX bytes without importing (sheet list for the chooser).
+ *  Throws with a plain message when the file is refused. */
+export function previewXlsx(bytes: Uint8Array): XlsxParseResult {
+  return parseXlsx(bytes);
+}
+
+/** Import one .xlsx/.xlsm file's bytes into state. `sheetName`
+ *  names the sheet to import; null imports the first sheet. Returns
+ *  the next state plus the import report, or the unchanged state plus
+ *  a plain-language error when the file is refused. Never throws. */
+export function importFileBytes(
+  state: UiState,
+  fileName: string,
+  bytes: Uint8Array,
+  actor: string,
+  occurredAt: string,
+  sheetName: string | null = null,
+): { state: UiState; report: ImportReport | null; error: string | null } {
+  const lower = fileName.toLowerCase();
+  if (!lower.endsWith(".xlsx") && !lower.endsWith(".xlsm")) {
+    return {
+      state,
+      report: null,
+      error: `Import refused: ${fileName} is not a .xlsx or .xlsm file.`,
+    };
+  }
+  try {
+    const parsed = parseXlsx(bytes);
+    if (parsed.sheets.length === 0) {
+      return { state, report: null, error: `XLSX import refused: ${fileName} has no sheets.` };
+    }
+    const sheet =
+      sheetName === null
+        ? (parsed.sheets[0] as (typeof parsed.sheets)[number])
+        : parsed.sheets.find((s) => s.name === sheetName);
+    if (sheet === undefined) {
+      return {
+        state,
+        report: null,
+        error: `XLSX import refused: ${fileName} has no sheet named "${sheetName}". Sheets in the file: ${parsed.sheets.map((s) => s.name).join(", ")}.`,
+      };
+    }
+    const mapped = sheet.rows.map(mapImportedRow);
+    return importMappedRows(state, fileName, mapped, sheet.headers, sheet.rows.length, parsed.fileHashSha256, actor, occurredAt, {
+      warnings: [...parsed.warnings, ...sheet.warnings],
+      sheetName: sheet.name,
+      sheetNames: parsed.sheets.map((s) => s.name),
+    });
+  } catch (err) {
+    return {
+      state,
+      report: null,
+      error: err instanceof Error ? err.message : String(err),
+    };
+  }
+}
 
 /** Import one file's text into state. Returns the next state plus the
  *  import report, or the unchanged state plus a plain-language error
@@ -362,43 +477,13 @@ export function importFileText(
         state,
         report: null,
         error:
-          "XLSX import is not implemented yet: reading a real .xlsx needs a DEFLATE reader and the app has none (Stage 8 item). CSV is the interchange format — export the sheet as CSV and import that.",
+          "XLSX import refused: the file must be read as bytes, not text. Choose the file again in the Import step — the file picker reads it as bytes.",
       };
     }
     if (lower.endsWith(".csv")) {
-      const { headers, rows } = parseCsv(text);
+      const { headers, rows, warnings } = parseCsv(text);
       const mapped = rows.map(mapImportedRow);
-      const dopt = mapped.map((r) => r.dopt).find((d) => d !== null) ?? null;
-      if (dopt === null) {
-        return {
-          state,
-          report: null,
-          error:
-            "CSV import refused: no dopt column value found. DOPT is a case fact the validation needs, and no date is guessed for it — add a dopt column (YYYY-MM-DD, same on every row).",
-        };
-      }
-      const caseNumber =
-        mapped.map((r) => r.raw["caseNumber"]).find((c) => c !== undefined && c.trim() !== "") ??
-        fileName.replace(/\.[^.]*$/, "");
-      const importedDate = occurredAt.slice(0, 10);
-      const { package: pkg, report } = rowsToCasePackage(mapped, {
-        caseNumber: (caseNumber as string).trim(),
-        planName: "Imported plan — name not supplied in file",
-        planNumber: "not supplied",
-        dopt,
-        importId: `${fileName.replace(/[^A-Za-z0-9._-]/g, "_")}-${rows.length}`,
-        importedDate,
-        importedBy: actor,
-        sourceFileName: fileName,
-        sourceFileHash: "not-computed",
-      }, unknownColumns(headers));
-      const next = applyEvent(state, {
-        kind: "import-case-package",
-        casePackage: pkg,
-        actor,
-        occurredAt,
-      });
-      return { state: next, report, error: null };
+      return importMappedRows(state, fileName, mapped, headers, rows.length, "not-computed", actor, occurredAt, { warnings });
     }
     if (lower.endsWith(".json")) {
       const parsed = parseJsonImport(text);
@@ -420,47 +505,20 @@ export function importFileText(
             badDates: 0,
             badNumbers: 0,
             snapshotHash: parsed.package.events[parsed.package.events.length - 1]?.snapshotHashAfter ?? "no-snapshot-recorded",
+            warnings: [],
+            sheetName: null,
+            sheetNames: [],
           },
           error: null,
         };
       }
       const mapped = parsed.rows.map(mapImportedRow);
-      const dopt = mapped.map((r) => r.dopt).find((d) => d !== null) ?? null;
-      if (dopt === null) {
-        return {
-          state,
-          report: null,
-          error:
-            "JSON import refused: no dopt value found in the rows. DOPT is a case fact the validation needs, and no date is guessed for it — add a dopt field (YYYY-MM-DD) to the rows.",
-        };
-      }
-      const caseNumber =
-        mapped.map((r) => r.raw["caseNumber"]).find((c) => c !== undefined && c.trim() !== "") ??
-        fileName.replace(/\.[^.]*$/, "");
-      const importedDate = occurredAt.slice(0, 10);
-      const { package: pkg, report } = rowsToCasePackage(mapped, {
-        caseNumber: (caseNumber as string).trim(),
-        planName: "Imported plan — name not supplied in file",
-        planNumber: "not supplied",
-        dopt,
-        importId: `${fileName.replace(/[^A-Za-z0-9._-]/g, "_")}-${parsed.rows.length}`,
-        importedDate,
-        importedBy: actor,
-        sourceFileName: fileName,
-        sourceFileHash: "not-computed",
-      }, unknownColumns(parsed.headers));
-      const next = applyEvent(state, {
-        kind: "import-case-package",
-        casePackage: pkg,
-        actor,
-        occurredAt,
-      });
-      return { state: next, report, error: null };
+      return importMappedRows(state, fileName, mapped, parsed.headers, parsed.rows.length, "not-computed", actor, occurredAt);
     }
     return {
       state,
       report: null,
-      error: `Import refused: ${fileName} is not a .csv or .json file.`,
+      error: `Import refused: ${fileName} is not a .csv, .json, .xlsx, or .xlsm file.`,
     };
   } catch (err) {
     return {
@@ -476,6 +534,16 @@ export function importReportSummary(report: ImportReport): string {
   const parts = [
     `${report.fileName}: ${report.participantsImported} participant(s) imported from ${report.rowsRead} row(s).`,
   ];
+  if (report.sheetName !== null) {
+    parts.push(`Sheet "${report.sheetName}" used.`);
+    const others = report.sheetNames.filter((n) => n !== report.sheetName);
+    if (others.length > 0) {
+      parts.push(`Other sheets in the file (not imported): ${others.join(", ")}.`);
+    }
+  }
+  if (report.warnings.length > 0) {
+    parts.push(`Warnings: ${report.warnings.join(" ")}`);
+  }
   if (report.quarantinedRows.length > 0) {
     parts.push(
       `${report.quarantinedRows.length} row(s) quarantined: ${report.quarantinedRows.map((r) => `row ${r.rowNumber} (${r.reason})`).join("; ")}.`,
@@ -2056,32 +2124,114 @@ export function bootApp(options?: BootOptions): AppHandle | null {
     renderApp(root, state);
     options?.onStateChange?.(state);
   });
-  // File import (Stage 7 Robustness D3): the picker hands the file
-  // text to importFileText; a refused file changes nothing and the
-  // reason is shown in the import status and the status line.
+  // File import (Stage 7 Robustness D3, Stage 8 XLSX): the picker
+  // hands CSV/JSON text to importFileText and XLSX/XLSM bytes to
+  // importFileBytes. A refused file changes nothing and the reason
+  // is shown in the import status and the status line. A workbook
+  // with more than one sheet waits for the sheet chooser: the file
+  // is parsed once, the chooser lists the sheets, and the Import
+  // sheet button imports the chosen sheet.
   const importInput = root.querySelector<HTMLInputElement>("#import-file");
   if (importInput !== null) {
+    // Parsed workbook waiting for a sheet choice (null when none).
+    let pendingXlsx: { fileName: string; parsed: XlsxParseResult } | null = null;
+    const showImportResult = (
+      result: { state: UiState; report: ImportReport | null; error: string | null },
+    ): void => {
+      const statusEl = elementById(root, "import-status");
+      if (result.error !== null) {
+        if (statusEl !== null) statusEl.textContent = result.error;
+        renderApp(root, state);
+        const status = elementById(root, "status-line");
+        if (status !== null) status.textContent = `Could not import: ${result.error}`;
+        return;
+      }
+      state = result.state;
+      if (result.report !== null && statusEl !== null) {
+        statusEl.textContent = importReportSummary(result.report);
+      }
+      renderApp(root, state);
+      options?.onStateChange?.(state);
+    };
+    const hideSheetChooser = (): void => {
+      pendingXlsx = null;
+      const row = elementById(root, "import-sheet-row");
+      if (row !== null) row.hidden = true;
+    };
     listen(importInput, "change", () => {
       const file = importInput.files?.[0];
       if (file === undefined || file === null) return;
+      hideSheetChooser();
+      const lower = file.name.toLowerCase();
+      if (lower.endsWith(".xlsx") || lower.endsWith(".xlsm")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const buffer = reader.result;
+          if (!(buffer instanceof ArrayBuffer)) {
+            const statusEl = elementById(root, "import-status");
+            if (statusEl !== null) statusEl.textContent = `Could not read ${file.name}.`;
+            return;
+          }
+          let parsed: XlsxParseResult;
+          try {
+            parsed = previewXlsx(new Uint8Array(buffer));
+          } catch (err) {
+            showImportResult({
+              state,
+              report: null,
+              error: err instanceof Error ? err.message : String(err),
+            });
+            return;
+          }
+          if (parsed.sheets.length === 1) {
+            const only = parsed.sheets[0] as (typeof parsed.sheets)[number];
+            showImportResult(
+              importMappedRows(
+                state,
+                file.name,
+                only.rows.map(mapImportedRow),
+                only.headers,
+                only.rows.length,
+                parsed.fileHashSha256,
+                actor,
+                calculationTimestamp(state),
+                {
+                  warnings: [...parsed.warnings, ...only.warnings],
+                  sheetName: only.name,
+                  sheetNames: parsed.sheets.map((s) => s.name),
+                },
+              ),
+            );
+            return;
+          }
+          pendingXlsx = { fileName: file.name, parsed };
+          const select = root.querySelector<HTMLSelectElement>("#import-sheet");
+          const row = elementById(root, "import-sheet-row");
+          const statusEl = elementById(root, "import-status");
+          if (select !== null) {
+            select.innerHTML = parsed.sheets
+              .map((s) => `<option value="${s.name.replace(/"/g, "&quot;")}">${s.name.replace(/</g, "&lt;")}</option>`)
+              .join("");
+          }
+          if (row !== null) row.hidden = false;
+          if (statusEl !== null) {
+            statusEl.textContent =
+              `${file.name} has ${parsed.sheets.length} sheets. Choose a sheet, then press Import sheet. ` +
+              `Only the chosen sheet is imported.`;
+          }
+        };
+        reader.onerror = () => {
+          const statusEl = elementById(root, "import-status");
+          if (statusEl !== null) statusEl.textContent = `Could not read ${file.name}.`;
+        };
+        reader.readAsArrayBuffer(file);
+        importInput.value = "";
+        return;
+      }
       const reader = new FileReader();
       reader.onload = () => {
         const text = typeof reader.result === "string" ? reader.result : "";
-        const result = importFileText(state, file.name, text, actor, calculationTimestamp(state));
-        const statusEl = elementById(root, "import-status");
-        if (result.error !== null) {
-          if (statusEl !== null) statusEl.textContent = result.error;
-          renderApp(root, state);
-          const status = elementById(root, "status-line");
-          if (status !== null) status.textContent = `Could not import: ${result.error}`;
-          return;
-        }
-        state = result.state;
-        if (result.report !== null && statusEl !== null) {
-          statusEl.textContent = importReportSummary(result.report);
-        }
-        renderApp(root, state);
-        options?.onStateChange?.(state);
+        showImportResult(importFileText(state, file.name, text, actor, calculationTimestamp(state)));
       };
       reader.onerror = () => {
         const statusEl = elementById(root, "import-status");
@@ -2090,6 +2240,39 @@ export function bootApp(options?: BootOptions): AppHandle | null {
       reader.readAsText(file);
       importInput.value = "";
     });
+    const sheetConfirm = elementById(root, "import-sheet-confirm");
+    if (sheetConfirm !== null) {
+      listen(sheetConfirm, "click", () => {
+        if (pendingXlsx === null) return;
+        const select = root.querySelector<HTMLSelectElement>("#import-sheet");
+        const chosen = select === null ? null : select.value;
+        if (chosen === null || chosen === "") return;
+        // No re-parse: the pending result already holds the chosen
+        // sheet's rows. They go through the shared row path, so the
+        // same dopt rule, case-number fallback, and quarantine rules
+        // apply as for a single-sheet import.
+        const sheet = pendingXlsx.parsed.sheets.find((s) => s.name === chosen);
+        if (sheet === undefined) return;
+        const mapped = sheet.rows.map(mapImportedRow);
+        const result = importMappedRows(
+          state,
+          pendingXlsx.fileName,
+          mapped,
+          sheet.headers,
+          sheet.rows.length,
+          pendingXlsx.parsed.fileHashSha256,
+          actor,
+          calculationTimestamp(state),
+          {
+            warnings: [...pendingXlsx.parsed.warnings, ...sheet.warnings],
+            sheetName: sheet.name,
+            sheetNames: pendingXlsx.parsed.sheets.map((s) => s.name),
+          },
+        );
+        hideSheetChooser();
+        showImportResult(result);
+      });
+    }
   }
   // Calculation date (Stage 7 Repro D3): pinning a date makes a
   // hand-driven run reproducible; clearing it returns to wall-clock

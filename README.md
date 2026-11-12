@@ -80,8 +80,9 @@ Locked steps stay disabled and say why. A locked step cannot be skipped.
 
 ### Import
 
-Import CSV or JSON. XLSX import is not done yet. CSV is the interchange
-format.
+Import CSV, JSON, or XLSX. XLSX import reads cached values only.
+It never runs macros and never reads formulas. A workbook with more
+than one sheet asks which sheet to import.
 
 ### Try the demo case first
 
@@ -113,13 +114,11 @@ is a benefit-correction rule. It is not a reconciliation rule.
 
 - **Stage 7 verdict: conditional pass.** See
   [stage7/VERIFICATION_REPORT.md](stage7/VERIFICATION_REPORT.md).
-  Every check that can run on the build machine passes. Three items
+  Every check that can run on the build machine passes. Two items
   are still open.
 - **Edge test outstanding.** The system is verified in Chromium on
   Linux. The definitive test in Microsoft Edge, on the user's testing
   machine, has not been run yet.
-- **XLSX import not done.** CSV and JSON import work. XLSX import
-  needs a DEFLATE decoder. That is Stage 8 work.
 - **UI path at 100,000 participants not run.** The engine path at
   100,000 runs in the browser in about 278 seconds. The UI path at
   10,000 runs in 9.0 seconds. The UI path at 100,000 has not been

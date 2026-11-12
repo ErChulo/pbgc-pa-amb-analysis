@@ -14,6 +14,24 @@ declare module "node:test" {
   export function it(name: string, fn: () => void | Promise<void>): void;
 }
 
+declare module "node:zlib" {
+  export const constants: { Z_FIXED: number; Z_DEFAULT_STRATEGY: number };
+  export function deflateRawSync(
+    data: Uint8Array,
+    options?: { level?: number; strategy?: number },
+  ): Uint8Array;
+}
+
+declare module "node:fs" {
+  export function readFileSync(path: string): Uint8Array;
+}
+
+declare module "node:path" {
+  export function join(...parts: string[]): string;
+}
+
+declare const process: { cwd(): string };
+
 declare module "node:assert/strict" {
   const assert: {
     equal(actual: unknown, expected: unknown, message?: string): void;
@@ -23,7 +41,7 @@ declare module "node:assert/strict" {
     ok(value: unknown, message?: string): void;
     match(value: string, regex: RegExp, message?: string): void;
     doesNotMatch(value: string, regex: RegExp, message?: string): void;
-    throws(fn: () => unknown, expected?: RegExp | string, message?: string): void;
+    throws(fn: () => unknown, expected?: RegExp | string | ((err: unknown) => boolean), message?: string): void;
   };
   export default assert;
 }

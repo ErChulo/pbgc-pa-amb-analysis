@@ -38,6 +38,13 @@ export { selectProvisionsByDate } from "../src/compose";
 export { evaluateFormulaCall } from "../src/formulas";
 export { testCounterfactual } from "../src/pipeline";
 export { rankCounterfactuals } from "../src/reconciliation";
+// Stage 8 XLSX import: the reader and the XLSX writer, reachable
+// from the page so the Playwright suites can build fixtures with the
+// app's own writer and parse real workbooks through the app's own
+// reader. No behaviour change.
+export { parseXlsx } from "../src/ui/xlsxReader";
+export { buildXlsx } from "../src/ui/exports";
+export { mapImportedRow } from "../src/ui/import";
 
 import { bootApp } from "../src/ui/main";
 

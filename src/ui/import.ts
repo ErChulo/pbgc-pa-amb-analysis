@@ -9,17 +9,22 @@
  * - CSV: a strict parser (quoted fields, CRLF; an unclosed quote or a
  *   ragged row rejects the file with the row named, never a silent
  *   partial load) plus a row mapper into ValidationParticipant records
- *   and into a CasePackage. Unparseable cells become badDates /
+ *   and into a CasePackage. Leading title rows (at most one non-empty
+ *   cell) are skipped and warned, the first row with two or more
+ *   non-empty cells is the header — the same rule as the XLSX reader
+ *   (src/ui/headerRows.ts). Unparseable cells become badDates /
  *   badNumbers entries with the value kept null — the row is loaded and
  *   quarantined by S-07/S-08, never dropped and never guessed.
  * - Structured JSON: either a CasePackage (the app's own shape) or a
  *   row array / { rows } in the same CSV column shape.
- * - XLSX/XLSM: NOT implemented here. Reading a real .xlsx needs a
- *   DEFLATE (inflate) decoder — Excel writes deflated entries, and the
- *   app has no inflate implementation and may take no external package.
- *   That is a recorded Stage 8 item (see stage7/06-stage7-fixes.md);
- *   CSV is the interchange format until then. An .xlsx file is refused
- *   with that reason, never silently misread.
+ * - XLSX/XLSM: read by src/ui/xlsxReader.ts (Stage 8: hand-built
+ *   inflate + ZIP + OOXML reader, no external package). The reader
+ *   returns cached cell values only — it never runs macros and never
+ *   evaluates formulas. The chosen sheet's headers and rows flow
+ *   through the same mapper and package builder as CSV rows
+ *   (mapImportedRow, rowsToCasePackage), so the same dopt rule, the
+ *   same case-number fallback, and the same quarantine rules apply.
+ *   A refused .xlsx changes nothing and says why in plain words.
  *
  * A blank is null, never zero. No value is invented: a CSV without a
  * `dopt` column is refused (DOPT is a case fact the validation context
@@ -34,6 +39,7 @@
 
 import { validateDateString } from "../dates";
 import { makeMoney } from "../decimal";
+import { findHeaderRow } from "./headerRows.js";
 import { appendCaseEvent, createEmptyCasePackage, makeSourceRecord } from "../model";
 import type {
   BenefitObservation,
@@ -62,10 +68,19 @@ import type {
 // ---------------------------------------------------------------------------
 
 /** Parse CSV text into a header row and row objects. Throws with the row
- *  named on an unclosed quote or a ragged row; an empty file throws. */
+ *  named on an unclosed quote or a ragged row; an empty file throws.
+ *  Title rows: the file is expected to be a table of data. Leading rows
+ *  with at most one non-empty cell (plus blank rows) are skipped as
+ *  title rows — each is reported in `warnings`, never dropped
+ *  silently — and the first row with two or more non-empty cells is
+ *  the header. A file with no such row is refused (no header row).
+ *  The rule is shared with the XLSX reader (src/ui/headerRows.ts).
+ *  Row numbers in warnings and errors are positions in the non-empty
+ *  rows (index + 1), the existing convention. */
 export function parseCsv(text: string): {
   headers: string[];
   rows: Array<Record<string, string>>;
+  warnings: string[];
 } {
   if (text.trim().length === 0) {
     throw new Error("CSV import refused: the file is empty.");
@@ -122,12 +137,22 @@ export function parseCsv(text: string): {
   if (nonEmpty.length === 0) {
     throw new Error("CSV import refused: the file has no data rows.");
   }
-  const headers = (nonEmpty[0] as string[]).map((h) => h.trim());
+  const found = findHeaderRow(nonEmpty);
+  if (found.headerIndex === undefined) {
+    throw new Error(
+      "CSV import refused: the file has no header row — no rows hold two or more cells. The file is expected to be a table of data.",
+    );
+  }
+  const warnings = found.skipped.map(
+    (s) => `CSV row ${s.index + 1} "${s.text}" skipped — title row, not the header row.`,
+  );
+  const headerIndex = found.headerIndex;
+  const headers = (nonEmpty[headerIndex] as string[]).map((h) => h.trim());
   if (headers.some((h) => h.length === 0)) {
     throw new Error("CSV import refused: the header row has a blank column name.");
   }
   const rows: Array<Record<string, string>> = [];
-  for (let r = 1; r < nonEmpty.length; r += 1) {
+  for (let r = headerIndex + 1; r < nonEmpty.length; r += 1) {
     const cells = nonEmpty[r] as string[];
     if (cells.length !== headers.length) {
       throw new Error(
@@ -140,7 +165,7 @@ export function parseCsv(text: string): {
     });
     rows.push(row);
   }
-  return { headers, rows };
+  return { headers, rows, warnings };
 }
 
 // ---------------------------------------------------------------------------
@@ -501,6 +526,12 @@ export interface ImportReport {
   badDates: number;
   badNumbers: number;
   snapshotHash: string;
+  /** Reader warnings (XLSX and CSV; empty for JSON). */
+  warnings: string[];
+  /** Sheet the rows came from (XLSX only; null for CSV/JSON). */
+  sheetName: string | null;
+  /** Every sheet in the file (XLSX only; empty for CSV/JSON). */
+  sheetNames: string[];
 }
 
 /** The "no tolerance set" record a fresh import carries. It is not a
@@ -569,6 +600,11 @@ export function rowsToCasePackage(
   rows: readonly ImportedRow[],
   meta: ImportMeta,
   unknownFields: readonly string[],
+  extra?: {
+    warnings?: readonly string[];
+    sheetName?: string | null;
+    sheetNames?: readonly string[];
+  },
 ): { package: CasePackage; report: ImportReport } {
   const prov = importProv(meta);
   const snapshotHash = `import-${meta.importId}`;
@@ -830,6 +866,9 @@ export function rowsToCasePackage(
       badDates,
       badNumbers,
       snapshotHash,
+      warnings: [...(extra?.warnings ?? [])],
+      sheetName: extra?.sheetName ?? null,
+      sheetNames: [...(extra?.sheetNames ?? [])],
     },
   };
 }

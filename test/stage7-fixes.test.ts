@@ -13,6 +13,9 @@
  * - Robustness D4: re-import resets wizard completion flags.
  * - Robustness D3: CSV + JSON import (parse, quarantine, refuse);
  *   XLSX refused with the exact gap.
+ * - CSV title rows (Stage 8): same rule as XLSX — leading one-cell
+ *   rows are skipped and warned, the header is the first row with
+ *   two or more non-empty cells.
  * - Accuracy D-ACC-1: demo SYN-V-01 H15 is plausible, not supported,
  *   and Verified still rests on tolerance alone.
  * - Accuracy G-ACC-5 (§20): a materially incorrect record the
@@ -554,18 +557,108 @@ describe("Robustness D3 — CSV + JSON import (Stage 7)", () => {
     assert.equal(state.casePackage?.participants.length, 6);
   });
 
-  it("XLSX is refused with the exact gap (no DEFLATE reader), not silently dropped", () => {
+  it("XLSX through the text path is refused (bytes path only), state unchanged", () => {
     const { state, error } = importFileText(freshUiState(), "case.xlsx", "PK\u0003\u0004", ACTOR, AT);
     assert.notEqual(error, null);
-    assert.match(error ?? "", /DEFLATE/);
-    assert.match(error ?? "", /Stage 8/);
+    assert.match(error ?? "", /bytes/);
     assert.equal(state.casePackage, null);
   });
 
   it("an unknown extension is refused", () => {
     const { error } = importFileText(freshUiState(), "case.txt", "hello", ACTOR, AT);
     assert.notEqual(error, null);
-    assert.match(error ?? "", /\.csv or \.json/);
+    assert.match(error ?? "", /\.csv, \.json, \.xlsx, or \.xlsm/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// CSV title rows above the header (Stage 8) — same rule as XLSX:
+// skip leading rows with at most one non-empty cell (plus blank rows)
+// until the first row with two or more non-empty cells; that row is
+// the header. Each skipped title is warned, never dropped silently.
+// ---------------------------------------------------------------------------
+
+describe("CSV title rows above the header (Stage 8)", () => {
+  const TITLE = "Synthetic Census Title";
+  const HEADERS = ["participantKey", "dopt", "paAmbMinor"];
+  const TITLE_WARNING = `CSV row 1 "${TITLE}" skipped — title row, not the header row.`;
+  const DATA = "SYN-T-001,2024-06-30,100000\nSYN-T-002,2024-06-30,200000\n";
+  const HEADER_LINE = "participantKey,dopt,paAmbMinor\n";
+
+  it("(a) one-cell title row + header + data rows imports with the header from row 2", () => {
+    const { headers, rows, warnings } = parseCsv(`${TITLE}\n${HEADER_LINE}${DATA}`);
+    assert.deepEqual(headers, HEADERS);
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.["participantKey"], "SYN-T-001");
+    assert.equal(rows[0]?.["paAmbMinor"], "100000");
+    assert.equal(rows[1]?.["participantKey"], "SYN-T-002");
+    assert.deepEqual(warnings, [TITLE_WARNING]);
+  });
+
+  it("(b) two title rows, then header", () => {
+    const { headers, rows, warnings } = parseCsv(
+      `${TITLE}\nSecond Title Row\n${HEADER_LINE}SYN-T-001,2024-06-30,100000\n`,
+    );
+    assert.deepEqual(headers, HEADERS);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.["participantKey"], "SYN-T-001");
+    assert.deepEqual(warnings, [
+      TITLE_WARNING,
+      `CSV row 2 "Second Title Row" skipped — title row, not the header row.`,
+    ]);
+  });
+
+  it("(c) title row, blank row, then header", () => {
+    const { headers, rows, warnings } = parseCsv(`${TITLE}\n\n${HEADER_LINE}SYN-T-001,2024-06-30,100000\n`);
+    assert.deepEqual(headers, HEADERS);
+    assert.equal(rows.length, 1);
+    assert.equal(rows[0]?.["participantKey"], "SYN-T-001");
+    // The blank row is skipped silently; only the title row is warned.
+    assert.deepEqual(warnings, [TITLE_WARNING]);
+  });
+
+  it("(d) no title row — behavior unchanged, header from row 1", () => {
+    const { headers, rows, warnings } = parseCsv(`${HEADER_LINE}${DATA}`);
+    assert.deepEqual(headers, HEADERS);
+    assert.equal(rows.length, 2);
+    assert.equal(rows[0]?.["participantKey"], "SYN-T-001");
+    assert.deepEqual(warnings, []);
+  });
+
+  it("(e) only single-cell rows — refused, no header row", () => {
+    assert.throws(
+      () => parseCsv(`${TITLE}\nOnly one cell\nAnother single cell\n`),
+      (err: unknown) =>
+        err instanceof Error &&
+        err.message ===
+          "CSV import refused: the file has no header row — no rows hold two or more cells. The file is expected to be a table of data.",
+    );
+  });
+
+  it("(f) a data row wider than the header is still refused, title row or not", () => {
+    assert.throws(
+      () => parseCsv(`${TITLE}\nparticipantKey,dopt\nSYN-T-001,2024-06-30,100000\n`),
+      /row 3 has 3 columns, expected 2/,
+    );
+  });
+
+  it("(g) the skipped title text appears in the import report via importFileText", () => {
+    const { state, report, error } = importFileText(
+      freshUiState(),
+      "titled.csv",
+      `${TITLE}\n${HEADER_LINE}${DATA}`,
+      ACTOR,
+      AT,
+    );
+    assert.equal(error, null);
+    assert.equal(report?.participantsImported, 2);
+    assert.equal(report?.rowsRead, 2);
+    assert.equal(state.casePackage?.participants[0]?.participantKey, "SYN-T-001");
+    assert.ok(
+      report?.warnings.includes(TITLE_WARNING),
+      `report warnings should hold the title warning, got: ${JSON.stringify(report?.warnings)}`,
+    );
+    assert.ok(importReportSummary(report!).includes(TITLE), "the import summary should name the skipped title");
   });
 });
 
