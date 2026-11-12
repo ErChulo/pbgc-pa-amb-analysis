@@ -1,0 +1,332 @@
+[
+  {
+    "auditEventId": "ui:import:2026-11-12T00:00:00.000Z:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "import",
+    "participantKeys": [
+      "SYN-001",
+      "SYN-002",
+      "SYN-003",
+      "SYN-004",
+      "SYN-V-01",
+      "SYN-I-01"
+    ],
+    "summary": "Case case-demo imported (6 participants, snapshot demo-synthetic-no-file).",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:1",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-001",
+      "SYN-002",
+      "SYN-003",
+      "SYN-004",
+      "SYN-V-01",
+      "SYN-I-01"
+    ],
+    "summary": "Validation completed: 405 rules evaluated, 145 findings across 6 participants.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:2",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Calculation completed for SYN-001: exact 150000 minor units.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:3",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-002"
+    ],
+    "summary": "Calculation completed for SYN-002: bounds 158400–168300 minor units.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:4",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-003"
+    ],
+    "summary": "Calculation completed for SYN-003: exact 150000 minor units.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:5",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-004"
+    ],
+    "summary": "Calculation completed for SYN-004: bounds 90000–96000 minor units.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:6",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-V-01"
+    ],
+    "summary": "Calculation completed for SYN-V-01: exact 84950 minor units.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:7",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-I-01"
+    ],
+    "summary": "Calculation completed for SYN-I-01: indeterminate ([object Object]).",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:8",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Reconciliation completed for SYN-001: Δ 0 minor units, within-tolerance, recommended verified.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:9",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-002"
+    ],
+    "summary": "Reconciliation completed for SYN-002: not comparable (bounds-only), recommended requires-investigation.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:10",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-003"
+    ],
+    "summary": "Reconciliation completed for SYN-003: Δ 100000 minor units, outside-tolerance, recommended requires-investigation.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:11",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-004"
+    ],
+    "summary": "Reconciliation completed for SYN-004: not comparable (bounds-only), recommended requires-investigation.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:12",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-V-01"
+    ],
+    "summary": "Reconciliation completed for SYN-V-01: Δ 50 minor units, within-tolerance, recommended verified.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:13",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [
+      "SYN-I-01"
+    ],
+    "summary": "Reconciliation completed for SYN-I-01: not comparable (unresolved-comparison-basis), recommended indeterminate.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:14",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [],
+    "summary": "Statistics completed: population n=6, outlier flags 3.",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-001-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Disposition verified proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "verified"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-002-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-002"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-003-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-003"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-004-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-004"
+    ],
+    "summary": "Disposition requires-investigation proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "requires-investigation"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-V-01-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-V-01"
+    ],
+    "summary": "Disposition verified proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "verified"
+    }
+  },
+  {
+    "auditEventId": "ui-propose-SYN-I-01-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "system",
+    "kind": "disposition-proposed",
+    "participantKeys": [
+      "SYN-I-01"
+    ],
+    "summary": "Disposition indeterminate proposed (recommended).",
+    "detail": {
+      "fromDisposition": "unassessed",
+      "toDisposition": "indeterminate"
+    }
+  },
+  {
+    "auditEventId": "ui-approve-SYN-001-fixed:audit:0",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "A. Actuary",
+    "kind": "disposition-approved",
+    "participantKeys": [
+      "SYN-001"
+    ],
+    "summary": "Disposition verified approved by A. Actuary.",
+    "detail": {
+      "fromDisposition": "verified",
+      "toDisposition": "verified",
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  },
+  {
+    "auditEventId": "ui:calculation-run:2026-11-12T00:00:00.000Z:22",
+    "occurredAt": "2026-11-12T00:00:00.000Z",
+    "actor": "demo",
+    "kind": "calculation-run",
+    "participantKeys": [],
+    "summary": "Contribution package published (AMB v0.1.0, 1 findings).",
+    "detail": {
+      "inputSnapshotHash": "demo-synthetic-no-file",
+      "ruleVersion": "0.1.0"
+    }
+  }
+]
