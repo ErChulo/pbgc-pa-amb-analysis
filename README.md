@@ -1,8 +1,8 @@
 # PA_AMB Analysis System
 
-[![single HTML file](https://img.shields.io/badge/single%20HTML%20file-452%20KB-blue)](pa-amb-analysis.html)
+[![single HTML file](https://img.shields.io/badge/single%20HTML%20file-483%20KB-blue)](pa-amb-analysis.html)
 [![0 fetch](https://img.shields.io/badge/network%20fetch-0-green)](stage7/VERIFICATION_REPORT.md)
-[![tests passing](https://img.shields.io/badge/tests-847%20passing-brightgreen)](stage7/VERIFICATION_REPORT.md)
+[![tests passing](https://img.shields.io/badge/tests-928%20passing-brightgreen)](stage7/VERIFICATION_REPORT.md)
 [![TypeScript strict](https://img.shields.io/badge/TypeScript-strict-blue)](tsconfig.json)
 
 ## What this does
@@ -58,7 +58,7 @@ BCV3.PA_AMB_ACCEPT (Y/N). That is the only accept flag.
 
 ## How to use it
 
-The app is one file: `pa-amb-analysis.html` (452,219 bytes). Double-click
+The app is one file: `pa-amb-analysis.html` (483,250 bytes). Double-click
 it. It opens in the browser from `file://`. There is no server, no install,
 and no network fetch. It makes zero network requests.
 
@@ -83,6 +83,21 @@ Locked steps stay disabled and say why. A locked step cannot be skipped.
 Import CSV, JSON, or XLSX. XLSX import reads cached values only.
 It never runs macros and never reads formulas. A workbook with more
 than one sheet asks which sheet to import.
+
+Before you upload, the Import step shows the shape each file must
+have: every column, the salary shape, and the rules. A blank stays
+blank. It is never filled with zero.
+
+Title rows are skipped. A leading row with one cell is a title, not
+a header. The first row with two or more cells is the header.
+Skipped titles are warned, never dropped. This holds for CSV and
+XLSX.
+
+Salary columns come in two forms: salary_YYYY, one column per year,
+or S001–S050 with FRSTYEAR, LASTYEAR, ANNACT, and SALARYDESC.
+S-values are dollars in the file. The app stores cents.
+S001=60000 becomes 6000000. A file that mixes both forms is
+refused. Use one form only.
 
 ### Try the demo case first
 
@@ -146,7 +161,7 @@ is a benefit-correction rule. It is not a reconciliation rule.
 
 ```sh
 npm install   # esbuild + typescript, build machine only
-npm test      # tsc (strict) + node --test; 847 pass, 0 fail, 210 suites
+npm test      # tsc (strict) + node --test; 928 pass, 0 fail, 231 suites
 npm run bundle  # builds pa-amb-analysis.html
 ```
 
@@ -155,7 +170,7 @@ machine only. The shipped file needs nothing installed. It opens by
 double-click.
 
 Tests run in Node (`node:test`, no framework). The browser suite runs
-in Playwright, Chromium headless, from `file://`: 4/4 pass.
+in Playwright, Chromium headless, from `file://`: 8/8 pass.
 
 ## Repo
 
